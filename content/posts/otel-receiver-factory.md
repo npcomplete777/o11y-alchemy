@@ -2,10 +2,10 @@
 title: "The Receiver Factory: Accelerating OpenTelemetry Development"
 date: 2025-01-03
 draft: false
-tags: ["opentelemetry", "code-generation", "automation", "VALIS"]
+tags: ["opentelemetry", "code-generation", "automation"]
 categories: ["Implementation"]
 author: "Aaron Jacobs"
-description: "How we built a system that generates production-ready OTel receivers from API specifications"
+description: "Generating production-ready OTel receivers from API specifications"
 ---
 
 ## The OpenTelemetry Coverage Problem
@@ -20,13 +20,13 @@ What if you could generate receivers automatically?
 
 ## The Factory Approach
 
-We built a system that takes an API specification (OpenAPI/Swagger) and produces a working OpenTelemetry receiver. Not a skeleton—a production-ready receiver with proper semantic conventions, error handling, and configuration.
+I built a system that takes an API specification (OpenAPI/Swagger) and produces a working OpenTelemetry receiver. Not a skeleton—a production-ready receiver with proper semantic conventions, error handling, and configuration.
 
 The key insight: receiver structure is highly consistent. The variation is in *what* you're scraping and *how* you map it to OTel conventions. If you can formalize those mappings, you can automate the generation.
 
-Our factory uses:
+My factory uses:
 
-- **Schema enforcement** via OTel semantic conventions (Weaver)
+- **Schema enforcement** via OTel semantic conventions
 - **Template-based generation** for consistent structure
 - **Automated validation** against the collector build system
 - **Production verification** to confirm data actually flows
@@ -35,13 +35,13 @@ Our factory uses:
 
 Generation isn't enough. You need to know the receiver actually works.
 
-Our system implements a closed-loop: generate code, build it, deploy to a test collector, verify metrics appear in the backend. If something breaks, the error feeds back into the next generation attempt.
+My system implements a closed-loop: generate code, build it, deploy to a test collector, verify metrics appear in the backend. If something breaks, the error feeds back into the next generation attempt.
 
 This isn't just CI/CD—it's the AI observing the consequences of its own code and iterating. The verification backend becomes ground truth that the system learns from.
 
 ## Results
 
-We've used this factory to generate receivers for several platforms that lacked native OTel support:
+I've used this factory to generate receivers for several platforms that lacked native OTel support:
 
 - Apache Airflow (workflow orchestration metrics)
 - Snowflake (data warehouse performance)
@@ -60,13 +60,13 @@ It also enables self-service: teams can generate receivers for their own tools w
 
 ## What's Next
 
-The factory currently handles REST APIs with OpenAPI specs. We're expanding to cover:
+The factory currently handles REST APIs with OpenAPI specs. I'm expanding to cover:
 
 - GraphQL APIs
 - Database metric scraping
 - Log-based metric extraction
 
-The goal is comprehensive coverage—if a system exposes data, we should be able to generate an OTel receiver for it.
+The goal is comprehensive coverage—if a system exposes data, I should be able to generate an OTel receiver for it.
 
 ---
 

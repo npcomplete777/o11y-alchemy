@@ -2,7 +2,7 @@
 title: "Building AI Agents for Observability Platforms"
 date: 2025-01-03
 draft: false
-tags: ["MCP", "agentic-ai", "observability", "VALIS"]
+tags: ["MCP", "agentic-ai", "observability"]
 categories: ["Architecture"]
 author: "Aaron Jacobs"
 description: "Why full API coverage matters for autonomous observability operations"
@@ -22,7 +22,7 @@ This makes sense from a vendor perspective—write operations are risky. But it 
 
 What happens when you wire up the *entire* API surface of an observability platform?
 
-We built comprehensive MCP (Model Context Protocol) coverage for a major observability vendor—not the 15-20 curated endpoints vendors typically expose, but complete coverage across environment APIs, configuration APIs, and platform APIs.
+I built comprehensive MCP (Model Context Protocol) coverage for a major observability vendor—not the 15-20 curated endpoints vendors typically expose, but complete coverage across environment APIs, configuration APIs, and platform APIs.
 
 The result: nearly **100 tools** spanning everything from entity queries to dashboard creation to alert configuration to problem management.
 
@@ -42,7 +42,7 @@ With partial coverage, the agent gets stuck midway through and hands off to a hu
 
 Raw API access isn't enough. An AI with dozens of tools still needs to know *when* and *how* to use them effectively.
 
-We developed a "Skills" layer—structured documentation that encodes domain expertise. Think of it as operational runbooks that the AI reads before executing tasks.
+I developed a "Skills" layer—structured documentation that encodes domain expertise. Think of it as operational runbooks that the AI reads before executing tasks.
 
 A dashboard creation skill, for example, captures:
 - Which query patterns work for different visualization types
@@ -53,7 +53,7 @@ The AI consults relevant skills before acting, giving it the equivalent of an ex
 
 ## What This Enables
 
-With full API coverage plus skills, we've seen significant acceleration in operational workflows. Tasks that previously required switching between UIs, consulting documentation, and iterating through trial-and-error now complete in single autonomous runs.
+With full API coverage plus skills, I've seen significant acceleration in operational workflows. Tasks that previously required switching between UIs, consulting documentation, and iterating through trial-and-error now complete in single autonomous runs.
 
 More importantly, the AI can handle scenarios it's never explicitly seen—because it has the tools and knowledge to reason through novel situations rather than following rigid scripts.
 
