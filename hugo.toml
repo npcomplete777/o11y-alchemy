@@ -1,0 +1,62 @@
+baseURL = 'https://npcomplete777.github.io/o11y-alchemy/'
+languageCode = 'en-us'
+title = 'O11y Alchemy'
+theme = 'PaperMod'
+
+[params]
+  author = "Aaron Jacobs"
+  description = "The Intersection of Agentic AI and Observability"
+  env = "production"
+  defaultTheme = "dark"
+  ShowReadingTime = true
+  ShowShareButtons = true
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
+  ShowToc = true
+  TocOpen = false
+  
+  [params.homeInfoParams]
+    Title = "O11y Alchemy"
+    Content = """
+The intersection of agentic AI and observability.
+
+Exploring how AI agents can move beyond chatbots to actually operate infrastructure—from autonomous incident response to automated instrumentation development to intelligent platform migration.
+"""
+
+  [[params.socialIcons]]
+    name = "github"
+    url = "https://github.com/npcomplete777"
+
+  [[params.socialIcons]]
+    name = "linkedin"
+    url = "https://linkedin.com/in/aaronjacobs777"
+
+[menu]
+  [[menu.main]]
+    identifier = "posts"
+    name = "Articles"
+    url = "/posts/"
+    weight = 10
+  [[menu.main]]
+    identifier = "tags"
+    name = "Tags"
+    url = "/tags/"
+    weight = 20
+  [[menu.main]]
+    identifier = "about"
+    name = "About"
+    url = "/about/"
+    weight = 30
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+
+[markup]
+  [markup.highlight]
+    codeFences = true
+    guessSyntax = true
+    lineNos = false
+    style = "dracula"
+  [markup.goldmark.renderer]
+    unsafe = true
