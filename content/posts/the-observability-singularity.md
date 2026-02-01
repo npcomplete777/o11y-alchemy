@@ -64,7 +64,7 @@ The Observability Singularity occurs when we close this loop.
 
 What would it mean for an observability system to complete its own OODA loop?
 
-In mid-December 2024, I discovered Anthropic's Model Context Protocol and immediately recognized its implications for observability. Six weeks of intensive building later, I have a working system called VALIS—Vast Active Living Intelligence System—that demonstrates the technical barriers are lower than they appear. The velocity of development has been staggering: what would have taken months of integration work compresses into days when AI agents can directly perceive and act through standardized protocols.
+In mid-December 2025, I discovered Anthropic's Model Context Protocol and immediately recognized its implications for observability. Six weeks of intensive building later, I have a working system called VALIS—Vast Active Living Intelligence System—that demonstrates the technical barriers are lower than they appear. The velocity of development has been staggering: what would have taken months of integration work compresses into days when AI agents can directly perceive and act through standardized protocols.
 
 ### The Perception Layer: MCP as Sensory Integration
 
