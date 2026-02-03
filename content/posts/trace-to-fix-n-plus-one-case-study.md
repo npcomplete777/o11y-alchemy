@@ -1,16 +1,16 @@
 ---
-title: "From Trace Data to Production Fix: Detecting and Remediating an N+1 Query Anti-Pattern"
+title: "Closed-Loop Observability: From Trace Detection to Automated Remediation"
 date: 2026-02-01
 draft: false
-tags: ["MCP", "distributed-tracing", "anti-patterns", "GitOps", "OpenTelemetry"]
+tags: ["MCP", "distributed-tracing", "anti-patterns", "GitOps", "OpenTelemetry", "closed-loop"]
 categories: ["Case Study"]
 author: "Aaron Jacobs"
-description: "A case study in closed-loop observability: using distributed traces, MCP-integrated tooling, and GitOps to identify, fix, and verify a performance anti-pattern in a microservices application."
+description: "A case study in closed-loop observability: using distributed traces, MCP-integrated tooling, and GitOps to identify, fix, and verify a performance anti-pattern in a microservices application—demonstrating the shift from passive monitoring to active remediation."
 ---
 
 Modern observability platforms generate vast amounts of telemetry data—traces, metrics, and logs—that often go underutilized beyond basic dashboarding and alerting. This article demonstrates a complete workflow for extracting actionable intelligence from distributed traces: detecting a performance anti-pattern, implementing a fix, deploying it through GitOps, and validating the improvement—all orchestrated through an AI assistant integrated with observability and infrastructure tooling via the Model Context Protocol (MCP).
 
-The target application is the OpenTelemetry Astronomy Shop, a reference microservices application running on k3s (via OrbStack) and exporting OTLP telemetry to Dash0. The entire workflow was executed using Claude as an AI assistant with MCP servers providing access to Dash0 (observability), kubectl (Kubernetes), GitHub (source control), and ArgoCD (GitOps deployment).
+The target application is the OpenTelemetry Astronomy Shop, a reference microservices application running on k3s (via OrbStack) and exporting OTLP telemetry to Dash0. The entire workflow was orchestrated using Claude as an AI assistant with MCP servers providing access to Dash0 (observability), kubectl (Kubernetes), GitHub (source control), and ArgoCD (GitOps deployment).
 
 ## The Technology Stack
 
@@ -22,7 +22,18 @@ Before diving into the detection and remediation process, it's worth understandi
 - **ArgoCD**: GitOps continuous delivery, syncing Kubernetes manifests from GitHub to the cluster.
 - **MCP (Model Context Protocol)**: Anthropic's protocol enabling AI assistants to interact with external tools and services through standardized interfaces.
 
-## Phase 1: Anti-Pattern Detection Through Trace Analysis
+### Why MCP Matters for Observability
+
+Traditional observability tools provide UIs and dashboards—human interfaces for human investigation. MCP inverts this: it exposes observability platforms as programmatic APIs that AI assistants can query, correlate, and act upon.
+
+This enables a shift from:
+- **Observability 1.0**: "Set up dashboards, hope you graphed the right thing"
+- **Observability 2.0**: "Store rich events, query anything ad-hoc"
+- **Observability 3.0**: "AI agents query telemetry, detect patterns, take action"
+
+The Model Context Protocol provides standardized tool interfaces (like LSP did for code editors) so AI assistants can interact with any observability backend, infrastructure system, or development tool through a common protocol.
+
+## 1. Anti-Pattern Detection Through Trace Analysis
 
 ### Querying Span Data
 
@@ -63,7 +74,7 @@ func (cs *checkout) prepOrderItems(ctx context.Context,
 
 The trace data directly mapped to the code structure: each span represented one iteration of the loop. With 10 items in a cart, this pattern would generate 22 RPC calls (2×10 + GetCart + GetShippingQuote) instead of the optimal 4.
 
-## Phase 2: Implementing the Batch RPC Fix
+## 2. Implementing the Batch RPC Fix
 
 ### The Solution: Batch Operations
 
@@ -74,6 +85,8 @@ The fix required two components: adding batch methods to the downstream services
 **CurrencyService**: Added a `ConvertCurrencies` method that accepts an array of amounts and converts them all in one call.
 
 **CheckoutService**: Refactored `prepOrderItems` to collect all product IDs upfront, make a single batch call, then process results.
+
+The implementation can be viewed in the [GitHub commit history](https://github.com/npcomplete777/opentelemetry-demo/commits/fix/n-plus-one-checkout-batch).
 
 ### Deploying Through GitOps
 
@@ -91,7 +104,7 @@ k8s_get(resource="pods", namespace="otel-demo",
         selector="app.kubernetes.io/component in (checkout,product-catalog,currency)")
 ```
 
-## Phase 3: Validation and an Unexpected Discovery
+## 3. Validation and an Unexpected Discovery
 
 ### Initial Validation: Pattern Fix Confirmed
 
@@ -153,6 +166,26 @@ After both fixes (batch RPC pattern + resource allocation), the improvement was 
 | Pod restarts (30 min) | 44 | 0 | **100%** |
 | Error spans | Intermittent | 0 | **100%** |
 
+## Why This Pattern Matters: From Detection to Remediation
+
+This workflow demonstrates what the observability community calls "closing the loop". Traditional approaches stop at detection:
+
+1. **Monitor**: Set up alerts for known failure modes
+2. **React**: Get paged when something breaks
+3. **Debug**: Manually investigate logs and metrics
+4. **Fix**: Write code, test, deploy
+5. **Hope**: Pray it doesn't happen again
+
+The closed-loop approach extends through remediation:
+
+1. **Perceive**: AI queries telemetry for anti-patterns
+2. **Reason**: Correlates traces with code structure
+3. **Act**: Implements fix, tests, deploys via GitOps
+4. **Verify**: Confirms improvement in production telemetry
+5. **Learn**: Pattern detection improves for next time
+
+This isn't replacing SREs—it's **amplifying** their effectiveness by handling the mechanical parts of detection and remediation, freeing humans to focus on architectural decisions and complex investigations.
+
 ## Key Insights
 
 ### 1. Distributed Traces Are Underutilized
@@ -171,13 +204,34 @@ The Model Context Protocol allowed seamless integration of observability (Dash0)
 
 A 20Mi memory limit for a Go service with Kafka and OTel instrumentation is a configuration error waiting to cause problems. The Go runtime's `GOMEMLIMIT` environment variable should be set to ~90% of the container memory limit to allow the garbage collector to operate efficiently within bounds.
 
-## Conclusion
+## What Remained Human Decisions
 
-This case study demonstrates the power of combining AI assistants with observability tooling through standardized protocols like MCP. What began as an investigation into checkout latency led to discovering and fixing two distinct issues: an N+1 query anti-pattern in the application code and a resource starvation problem in the Kubernetes configuration.
+While the AI assistant orchestrated the technical workflow, several critical decisions remained human:
 
-The entire workflow—from detection through validation—was executed through natural language interaction with an AI assistant that had access to the necessary tools. This represents a shift from passive observability (dashboards and alerts) to active observability (AI-assisted detection, diagnosis, and remediation).
+- **Recognizing** that 2N+2 calls was a problem worth fixing (vs. acceptable)
+- **Choosing** batch RPCs over caching or other optimization strategies
+- **Validating** that the resource limit fix was correct (not just trusting the AI)
+- **Deciding** this was production-ready (not just passing tests)
+- **Determining** the architectural approach (batch operations vs. caching vs. async processing)
 
-As observability platforms expose more capabilities through programmatic interfaces like MCP, we can expect these closed-loop workflows to become increasingly common—and increasingly autonomous.
+The AI amplified my engineering productivity by handling the mechanical work—code generation, configuration management, deployment orchestration—but the strategic and architectural decisions were mine. This is observability-driven development, not autonomous coding.
+
+## Conclusion: Observability as Code
+
+This case study demonstrates a fundamental shift in how we think about observability tooling. By exposing observability platforms through programmatic interfaces like MCP, we transform telemetry from a passive data source into an active participant in the development lifecycle.
+
+The key insight: **observability instrumentation is code**, and code can reason about code. When your traces contain rich context (service names, operation types, resource attributes, timing data), AI assistants can:
+
+- Detect anti-patterns structurally (N+1 queries, chatty APIs, retry storms)
+- Correlate symptoms with root causes (Kafka latency ← OOMKilled restarts)
+- Implement fixes that are architecturally appropriate (batch RPCs, not caching)
+- Verify improvements in production telemetry (closing the loop)
+
+This isn't replacing engineers—it's **amplifying their leverage**. What took days of manual investigation, code changes, and deployment became hours of orchestrated automation. The engineer provides the judgment and domain expertise; the AI provides the mechanical execution.
+
+AI is fundamentally an amplifier. It magnifies the strengths of organizations with robust observability while exposing the dysfunctions of those without it. This case study proves the point: rich telemetry data enables AI-assisted remediation, but only when your observability practice is already sound.
+
+The future of observability isn't more dashboards—it's closed-loop systems that perceive, reason, and act on production telemetry. MCP is one protocol making this future possible.
 
 ---
 
@@ -188,3 +242,4 @@ As observability platforms expose more capabilities through programmatic interfa
 - [Dash0](https://dash0.com)
 - [ArgoCD](https://argo-cd.readthedocs.io)
 - [Go GOMEMLIMIT](https://pkg.go.dev/runtime#hdr-Environment_Variables)
+- [GitHub Commit: N+1 Fix](https://github.com/npcomplete777/opentelemetry-demo/commit/1b14533451b0d2a1ff9070585178925399986fcb)
