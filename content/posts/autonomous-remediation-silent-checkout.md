@@ -23,7 +23,7 @@ The truth was worse than it appeared: **orders were actually succeeding**. Payme
 VALIS detected this pattern through trace analysis with **99.98% confidence** using Bayesian inference:
 
 | Evidence | Prior | Posterior | Confidence Gain |
-|----------|-------|-----------|-----------------|
+|----------|-------|-----------|-----------------| 
 | Request completes but client times out | 5.0% | 34.2% | +29.2% |
 | Blocking I/O in request path | 34.2% | 78.6% | +44.4% |
 | Kafka write exceeds proxy timeout | 78.6% | 96.8% | +18.2% |
@@ -174,8 +174,9 @@ What made this possible wasn't just AI capability—it was the architecture of p
 │  │ Validate │◀───│  ArgoCD  │◀───│  Merge   │◀───│   Push   │     │
 │  │  Dash0   │    │  Deploy  │    │    PR    │    │  GitHub  │     │
 │  └──────────┘    └──────────┘    └──────────┘    └──────────┘     │
-│       │                                                             │
-│       └──────────────── VERIFICATION ◀──────────────────────────   │
+│       │                                               │            │
+│                                                                     │
+│       └──────────────── VERIFICATION ◀─────────────────────────────┘│
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -199,8 +200,6 @@ This demonstration proves several things:
 3. **MCP is the integration layer**. The Model Context Protocol allowed seamless connection between observability (Dash0), infrastructure (kubectl), source control (GitHub), and deployment (ArgoCD). Without standardized interfaces, this workflow would require custom integration code for each tool.
 
 4. **The human role shifts from author to architect**. I (Aaron) built the system that enables autonomous remediation. I did not write the fix, trigger the deployment, or verify the results. My leverage increased by building systems that can complete entire OODA loops without me.
-
-5. **33x acceleration is real**. What would have taken a human engineer 2-3 hours (investigate traces, identify root cause, write fix, test locally, create PR, wait for CI, merge, deploy, validate) completed in under 5 minutes autonomously.
 
 ## The Question
 
