@@ -47,7 +47,7 @@ VALIS — my autonomous observability system built on Claude with MCP-integrated
 ```
 PlaceOrder (297ms)
 └─ prepareOrderItemsAndShippingQuoteFromCart (132ms)
-   ├─ CartService/GetCart (32ms)            ← 1 call
+   ├─ CartService/GetCart (32ms)               ← 1 call
    ├─ ProductCatalogService/GetProduct (14ms)  ← Item 1
    ├─ CurrencyService/Convert (6ms)            ← Item 1
    ├─ ProductCatalogService/GetProduct (8ms)   ← Item 2
@@ -81,11 +81,11 @@ The second detection was structurally different but revealed through the same ge
 VALIS queried Dash0 for checkout spans and found an anomalous trace:
 
 ```
-PlaceOrder (165,084ms)          ← 2.75 MINUTES
-├─ prepareOrderItems (49ms)     ← Fast (batch fix working)
-├─ ChargePayment (3ms)          ← Fast
-├─ SendConfirmation (7ms)       ← Fast
-├─ EmptyCart (2ms)               ← Fast
+PlaceOrder (165,084ms)              ← 2.75 MINUTES
+├─ prepareOrderItems (49ms)         ← Fast (batch fix working)
+├─ ChargePayment (3ms)              ← Fast
+├─ SendConfirmation (7ms)           ← Fast
+├─ EmptyCart (2ms)                   ← Fast
 └─ sendToPostProcessor (165,000ms)  ← BLOCKING KAFKA WRITE
    └─ orders publish (142,732ms)
       └─ Kafka ack wait...
@@ -172,6 +172,56 @@ Each of these geometries is detectable through the same structural analysis fram
 3. Calculate confidence via Bayesian inference
 4. Act on high-confidence detections
 
+## Language-Specific Anti-Patterns: The Strongest Evidence
+
+There's an obvious objection to the universality claim: what about anti-patterns that only exist in specific runtimes? .NET's `SynchronizationContext` deadlocks. Java's classloader circular initialization. Python's GIL contention under asyncio. These are mechanisms unique to a single language. Surely they break the geometric framework?
+
+They don't. They strengthen it.
+
+Consider the .NET async deadlock — the classic case where a developer calls `.Result` or `.Wait()` on a `Task` inside a synchronization context, causing the continuation to wait for a thread that's blocked waiting for the continuation. This is a .NET-specific *mechanism*. Java doesn't have `SynchronizationContext`. Go doesn't have colored functions. The bug can only occur in .NET code.
+
+But what does it look like in the traces?
+
+A parent span starts. It invokes an async method, producing a child span. That child span either never completes or completes after an absurd duration — a timeout. Meanwhile, no other child spans appear, despite async methods being invoked. The trace tree shows a parent blocked on a single non-completing child with *zero concurrency despite async invocation*.
+
+That's a geometry. And it's the same geometry you'd see from a Python `asyncio` deadlock caused by `loop.run_until_complete()` inside a running event loop, or a Kotlin coroutine deadlock from `runBlocking` inside a coroutine scope, or a Java `CompletableFuture.get()` blocking the fork-join pool. Different languages, different mechanisms, identical trace shape: parent blocked on non-completing async child, zero concurrent work, eventual timeout.
+
+The language-specific mechanism determines *why* the deadlock occurs. The geometry determines *that* it occurs — and the geometry is universal.
+
+This reveals a clean separation into three layers:
+
+**Layer 1: Geometry (universal).** The structural properties of the trace tree — fan-out, temporal pattern, duration distribution, concurrency characteristics. This is where detection happens. Language-agnostic. Framework-agnostic. Vendor-agnostic.
+
+**Layer 2: Semantics (language-aware).** The span attributes that explain the geometry — `code.function`, `thread.id`, `runtime.name`, `rpc.system`. OpenTelemetry semantic conventions give us this layer. When the geometric detector flags a "deadlocked async" shape, the semantic attributes narrow the diagnosis: "this is a .NET service, the child span is `GetResultAsync`, the thread ID is the same for parent and child — probable `SynchronizationContext` capture."
+
+**Layer 3: Remediation (implementation-specific).** The actual code fix. In .NET: replace `.Result` with `await`, or use `ConfigureAwait(false)`. In Python: restructure to avoid nested event loops. In Java: avoid `get()` on the common fork-join pool. Each language has its own fix, but the fix is only needed because the geometry was detected — and the geometry was detected without knowing the language.
+
+This layering means the signature library becomes hierarchical:
+
+```
+Deadlocked Async (universal geometry)
+├── .NET: SynchronizationContext capture (.Result / .Wait())
+├── Java: CompletableFuture.get() on ForkJoinPool
+├── Python: run_until_complete inside running loop
+├── Kotlin: runBlocking inside coroutine scope
+└── [unknown runtime]: geometry detected, no specific diagnosis
+```
+
+That last entry is the most powerful. When the geometric detector encounters the "deadlocked async" shape in a language it has no specific refinement for — a new Rust service using tokio, an Erlang process with a receive deadlock, a Zig experiment — it can still *detect the problem* from the shape alone. It can say: "this trace shows a blocked parent waiting on a non-completing async child with zero concurrency. Something is deadlocked. Here's the span. Here's the service. Investigate."
+
+That capability — detecting unknown-language anti-patterns from geometry alone — doesn't exist in any APM tool on the market. Every APM vendor maintains separate agents for .NET, Java, Python, Go, each with its own detection logic, its own pattern library, its own blind spots. The geometric approach replaces all of them with one classifier that operates on trace topology.
+
+And it extends to every language-specific pathology I've examined:
+
+- **Java classloader deadlocks** produce a dependency cycle visible as two concurrent spans that both stall at the same timestamp — the same geometry as a database deadlock or distributed lock conflict.
+- **.NET `ThreadPool` starvation** produces progressively increasing queue times visible as growing gaps between parent span start and child span start — the same geometry as connection pool exhaustion.
+- **Python GIL contention** under async load produces serialized execution of nominally concurrent operations — the same geometry as a mutex bottleneck in any language.
+- **Go goroutine leaks** produce fan-out that increases over time without corresponding fan-in — the same geometry as a resource leak in any runtime.
+
+In every case, the language-specific mechanism is the *cause*. The trace geometry is the *symptom*. And symptoms have shapes that transcend their causes.
+
+Language-specific anti-patterns aren't exceptions to the geometric framework. They're the strongest evidence for it — because they prove that even mechanisms unique to a single runtime still produce universally recognizable trace shapes.
+
 ## Why This Hasn't Been Said Before
 
 The pieces of this observation exist independently in the literature:
@@ -230,6 +280,8 @@ If anti-patterns have language-agnostic geometric signatures, several things fol
 
 **Detection is vendor-agnostic.** I proved the N+1 detection on Dash0 with OTLP data. The same framework works on any backend that exposes trace data through a queryable interface — Honeycomb, Jaeger, Tempo, Datadog, Dynatrace. The geometry exists in the trace, not in the platform.
 
+**Language-specific anti-patterns become detectable without language-specific agents.** A .NET `SynchronizationContext` deadlock produces the same trace geometry as a Python asyncio deadlock. The geometric classifier finds both. Language-specific refinements improve the diagnosis, but the detection itself is universal. This eliminates the need for per-language APM agents with separate detection logic — one geometric classifier replaces them all.
+
 **New anti-patterns can be discovered empirically.** If you can measure trace topology, you can cluster traces by geometric similarity and discover anti-pattern signatures you didn't know to look for. The taxonomy doesn't need to be predefined. It can be *learned from production traffic*.
 
 **The human role shifts from pattern-matching to architecture.** If an agent can detect geometric signatures and implement fixes autonomously, engineers stop being debuggers and become architects of the systems that enable autonomous detection. The leverage changes by orders of magnitude.
@@ -246,7 +298,7 @@ And geometric structure is where the anti-patterns live.
 
 ## Conclusion
 
-I've demonstrated, with two empirical case studies on production systems, that anti-patterns in distributed systems produce characteristic geometric signatures in trace topology space. These signatures are invariant across programming languages, communication protocols, and observability platforms.
+I've demonstrated, with two empirical case studies on production systems, that anti-patterns in distributed systems produce characteristic geometric signatures in trace topology space. These signatures are invariant across programming languages, communication protocols, and observability platforms. Even anti-patterns rooted in language-specific runtime mechanisms — .NET synchronization context deadlocks, Java classloader cycles, Python GIL contention — produce trace geometries that are universally recognizable, because the symptom has a shape that transcends its cause.
 
 The N+1 pattern in Go gRPC calls looks the same as an N+1 pattern in any other language and protocol. The sync-over-async pattern in Kafka has a distinct but equally recognizable geometry. Both were detected by the same framework operating on structural properties of trace trees — fan-out, homogeneity, temporality, duration distribution — without knowledge of the underlying implementation.
 
