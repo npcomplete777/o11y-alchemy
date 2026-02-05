@@ -1,6 +1,6 @@
 ---
 title: "The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology"
-date: 2026-03-01
+date: 2026-02-04
 draft: false
 tags: ["distributed-tracing", "anti-patterns", "trace-topology", "OpenTelemetry", "VALIS", "geometric-detection", "observability", "autonomous-remediation"]
 categories: ["Research", "Case Study"]
