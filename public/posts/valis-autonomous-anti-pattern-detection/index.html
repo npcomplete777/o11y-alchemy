@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="dark">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>VALIS: Autonomous Anti-Pattern Detection for Production Observability | O11y Alchemy</title>
+<meta name="keywords" content="VALIS, MCP, Dash0, anti-patterns, autonomous-observability, statistical-analysis">
+<meta name="description" content="A deep technical exploration of VALIS—the Vast Active Living Intelligence System—and how its native integration with Dash0 telemetry enables autonomous detection of performance anti-patterns in distributed systems.">
+<meta name="author" content="Aaron Jacobs">
+<link rel="canonical" href="https://npcomplete777.github.io/o11y-alchemy/posts/valis-autonomous-anti-pattern-detection/">
+<link crossorigin="anonymous" href="/o11y-alchemy/assets/css/stylesheet.343cc480b9ffc8f04ccbe5e968ad674880cab773ec19905e93033065c1e7a804.css" integrity="sha256-NDzEgLn/yPBMy&#43;XpaK1nSIDKt3PsGZBekwMwZcHnqAQ=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://npcomplete777.github.io/o11y-alchemy/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://npcomplete777.github.io/o11y-alchemy/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://npcomplete777.github.io/o11y-alchemy/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://npcomplete777.github.io/o11y-alchemy/apple-touch-icon.png">
+<link rel="mask-icon" href="https://npcomplete777.github.io/o11y-alchemy/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://npcomplete777.github.io/o11y-alchemy/posts/valis-autonomous-anti-pattern-detection/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://npcomplete777.github.io/o11y-alchemy/posts/valis-autonomous-anti-pattern-detection/">
+  <meta property="og:site_name" content="O11y Alchemy">
+  <meta property="og:title" content="VALIS: Autonomous Anti-Pattern Detection for Production Observability">
+  <meta property="og:description" content="A deep technical exploration of VALIS—the Vast Active Living Intelligence System—and how its native integration with Dash0 telemetry enables autonomous detection of performance anti-patterns in distributed systems.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-02-01T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-02-01T00:00:00+00:00">
+    <meta property="article:tag" content="VALIS">
+    <meta property="article:tag" content="MCP">
+    <meta property="article:tag" content="Dash0">
+    <meta property="article:tag" content="Anti-Patterns">
+    <meta property="article:tag" content="Autonomous-Observability">
+    <meta property="article:tag" content="Statistical-Analysis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="VALIS: Autonomous Anti-Pattern Detection for Production Observability">
+<meta name="twitter:description" content="A deep technical exploration of VALIS—the Vast Active Living Intelligence System—and how its native integration with Dash0 telemetry enables autonomous detection of performance anti-patterns in distributed systems.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://npcomplete777.github.io/o11y-alchemy/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "VALIS: Autonomous Anti-Pattern Detection for Production Observability",
+      "item": "https://npcomplete777.github.io/o11y-alchemy/posts/valis-autonomous-anti-pattern-detection/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "VALIS: Autonomous Anti-Pattern Detection for Production Observability",
+  "name": "VALIS: Autonomous Anti-Pattern Detection for Production Observability",
+  "description": "A deep technical exploration of VALIS—the Vast Active Living Intelligence System—and how its native integration with Dash0 telemetry enables autonomous detection of performance anti-patterns in distributed systems.",
+  "keywords": [
+    "VALIS", "MCP", "Dash0", "anti-patterns", "autonomous-observability", "statistical-analysis"
+  ],
+  "articleBody": "The Problem with Passive Observability Most observability workflows are fundamentally reactive. We instrument our services, ship telemetry to a platform, build dashboards, configure alerts, and wait for something to break. When it does, we manually sift through traces, correlate logs, and pattern-match against our tribal knowledge of “things that have gone wrong before.”\nThis works—until it doesn’t. The complexity of distributed systems has outpaced human cognitive bandwidth. N+1 queries hide in trace waterfalls. Memory leaks creep up over days. Retry storms cascade across service boundaries in milliseconds. By the time a human notices, the damage is done.\nWhat if observability could be active? What if the system could perceive anti-patterns as they form, reason about their probability and impact, and act before they escalate?\nThis is VALIS.\nIntroducing VALIS: Vast Active Living Intelligence System Named after Philip K. Dick’s novel about a vast machine intelligence that perceives patterns in reality, VALIS is an MCP (Model Context Protocol) server that brings autonomous anti-pattern detection to observability platforms. It doesn’t replace human operators—it augments them with continuous statistical analysis and probabilistic reasoning.\nVALIS provides 14 specialized tools spanning:\nPattern Detection: Signature-based detection for 11 known anti-patterns including N+1 queries, retry storms, chatty APIs, memory leaks, connection pool exhaustion, and more Statistical Analysis: Anomaly detection (Z-score, MAD, IQR), changepoint detection (CUSUM, PELT, BOCPD), and SPC process control Predictive Capabilities: Time-series forecasting (Holt, Holt-Winters), Monte Carlo time-to-failure simulation Probabilistic Reasoning: Bayesian probability calculation with evidence chain tracking Correlation Analysis: Pearson, Spearman, and Granger causality testing The key insight: these tools are composable. An AI agent can chain them together to perform comprehensive analysis that would take a human engineer hours.\nNative Dash0 Integration Here’s where it gets interesting for the Dash0 engineering team.\nVALIS analyzes observability data natively. The valis_analyze_spans, valis_analyze_logs, and valis_analyze_metrics tools accept raw OTLP-compatible data—exactly what Dash0 collects and stores. There’s no transformation layer, no proprietary format, no vendor lock-in.\nA typical workflow looks like this:\n1. Query spans from Dash0: dash0_spans_query(service_name=\"checkout\", limit=200) 2. Feed directly to VALIS: valis_analyze_spans(spans=) 3. Get findings with calibrated confidence scores The integration is seamless because both systems speak OpenTelemetry natively. Dash0’s span attributes map directly to VALIS’s semantic convention expectations. Trace IDs correlate. Service names align. It just works.\nWhat I Observed Today Running VALIS against live Dash0 telemetry from an OpenTelemetry demo deployment, I captured:\n200 spans across 15+ microservices (frontend, checkout, cart, payment, product-catalog, recommendation, etc.) 200 logs with correlated trace context Full trace propagation through Kafka messaging, gRPC calls, and HTTP requests VALIS assessed the instrumentation quality at 0.78 (Good tier) with 100% semantic compliance on spans. This matters because VALIS calibrates its confidence scores based on data quality—poor instrumentation leads to appropriately skeptical findings.\nThe analysis revealed:\n4 latency anomalies at the 49ms range—all attributable to the AI assistant endpoint making LLM calls (expected behavior) A statistically significant changepoint indicating a regime shift in latency patterns 8 SPC violations including Western Electric Rule violations suggesting process instability Lag-2 cross-correlation of 0.796 between request sequences, indicating propagation effects through the service mesh No critical anti-patterns (N+1 queries, retry storms, connection pool exhaustion) were detected—the system is healthy. But VALIS didn’t just say “everything’s fine.” It provided evidence-based reasoning for that conclusion.\nThe Technical Architecture Signature-Based Detection VALIS maintains a library of 11 anti-pattern signatures, each with:\nEvidence indicators (what to look for in spans/logs/metrics) Base rates (prior probability in typical production systems) True/False positive rates (for Bayesian updating) When analyzing telemetry, VALIS doesn’t just pattern-match. It calculates the probability that an anti-pattern is present given the observed evidence. A finding with 95% confidence means something different than one with 35% confidence.\nStatistical Process Control The SPC analysis applies manufacturing quality control principles to observability:\nShewhart control charts with UCL/LCL bounds Western Electric rules for detecting non-random patterns Process capability indices (Cp, Cpk) for measuring stability Today’s analysis showed Cpk of 0.51 against latency targets—below the 1.33 threshold that indicates a capable process. This isn’t an alert, but it’s actionable intelligence: the checkout service has latency variability that warrants investigation.\nTime-to-Failure Prediction VALIS can run Monte Carlo simulations to predict when a degrading metric will cross a failure threshold. Feed it:\nCurrent value (e.g., 16.7ms latency) Growth rate and variance Failure threshold (e.g., 100ms SLA) It returns a probability distribution of time-to-failure. Today’s simulation indicated 165 minutes (2.75 hours) until SLA breach if current trends continued—giving operators a window for proactive intervention.\nEnterprise Production Implications This is a demo deployment. What happens when we point VALIS at enterprise production traffic?\nScale Considerations Dash0’s architecture handles high-cardinality telemetry efficiently. VALIS’s analysis tools are O(n) or O(n log n) for most operations. The bottleneck isn’t computation—it’s sample selection. At enterprise scale, you don’t analyze every span; you analyze statistically significant samples.\nA production integration might:\nSample intelligently: Use Dash0’s sampling rules to capture representative traffic plus 100% of errors Run continuous background analysis: VALIS detects anti-patterns before they alert Correlate with deployment events: Did that canary deploy introduce an N+1 query? Feed findings into remediation pipelines: Auto-create Jira tickets, trigger runbooks, or even auto-rollback The Closed-Loop Vision Imagine this workflow, fully automated:\nDash0 ingests spans from a new deployment VALIS detects N+1 query pattern with 87% confidence VALIS correlates with GitHub to find the offending code AI agent generates a batch query fix CI runs, tests pass ArgoCD deploys the fix VALIS confirms the anti-pattern is resolved This isn’t science fiction. I’ve demonstrated each component working. The integration is the engineering challenge—and Dash0 is uniquely positioned to enable it.\nWhy Dash0? Dash0’s OpenTelemetry-native architecture makes VALIS integration trivial. But there’s a deeper opportunity:\nBuilt-in instrumentation assessment: Dash0 could surface VALIS’s data quality scores, helping users understand where their instrumentation gaps are Native anti-pattern detection: Embed VALIS analysis in the Dash0 UI, surfacing findings alongside traces and logs Proactive alerting: Move beyond threshold alerts to probability-based warnings (“73% chance of connection pool exhaustion in next 2 hours”) Remediation suggestions: VALIS findings include actionable recommendations—Dash0 could integrate with ticketing/runbook systems The Philosophical Shift The name VALIS is intentional. In Dick’s novel, VALIS perceives information in reality that humans cannot see. Production observability is similar—the telemetry contains patterns that human cognition struggles to extract at scale.\nWe’ve spent decades building systems that record what happens. VALIS represents the shift to systems that understand what’s happening. Not through black-box ML that nobody trusts, but through transparent statistical methods with calibrated confidence.\nThe human remains in the loop—but as a strategic decision-maker, not a pattern-matching machine.\nTry It Yourself VALIS is available as an MCP server. Point it at your Dash0 data and see what it finds. The integration is straightforward:\nQuery telemetry from Dash0 (dash0_spans_query, dash0_logs_query) Pipe to VALIS (valis_analyze_spans, valis_analyze_logs, valis_analyze_metrics) Explore findings with probability scores and evidence chains For the Dash0 engineering team: I’d love to explore deeper integration. VALIS’s statistical engine combined with Dash0’s data platform could redefine what “observability” means.\nThe telemetry is already there. The algorithms exist. The question is: are we ready for observability that thinks?\nVALIS capabilities demonstrated in this article: valis_list_signatures, valis_assess_instrumentation_data, valis_analyze_spans, valis_analyze_logs, valis_analyze_metrics, valis_detect_anomalies, valis_detect_changepoints, valis_correlate, valis_forecast, valis_probability, valis_spc_analysis, valis_predict_ttf, valis_recommend_action\nPrevious: Building AI Agents for Observability Platforms\n",
+  "wordCount" : "1199",
+  "inLanguage": "en",
+  "datePublished": "2026-02-01T00:00:00Z",
+  "dateModified": "2026-02-01T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "Aaron Jacobs"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://npcomplete777.github.io/o11y-alchemy/posts/valis-autonomous-anti-pattern-detection/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "O11y Alchemy",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://npcomplete777.github.io/o11y-alchemy/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://npcomplete777.github.io/o11y-alchemy/" accesskey="h" title="O11y Alchemy (Alt + H)">O11y Alchemy</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://npcomplete777.github.io/o11y-alchemy/posts/" title="Articles">
+                    <span>Articles</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://npcomplete777.github.io/o11y-alchemy/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://npcomplete777.github.io/o11y-alchemy/about/" title="About">
+                    <span>About</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://npcomplete777.github.io/o11y-alchemy/">Home</a>&nbsp;»&nbsp;<a href="https://npcomplete777.github.io/o11y-alchemy/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      VALIS: Autonomous Anti-Pattern Detection for Production Observability
+    </h1>
+    <div class="post-description">
+      A deep technical exploration of VALIS—the Vast Active Living Intelligence System—and how its native integration with Dash0 telemetry enables autonomous detection of performance anti-patterns in distributed systems.
+    </div>
+    <div class="post-meta"><span title='2026-02-01 00:00:00 +0000 UTC'>February 1, 2026</span>&nbsp;·&nbsp;<span>6 min</span>&nbsp;·&nbsp;<span>Aaron Jacobs</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#the-problem-with-passive-observability" aria-label="The Problem with Passive Observability">The Problem with Passive Observability</a></li>
+                <li>
+                    <a href="#introducing-valis-vast-active-living-intelligence-system" aria-label="Introducing VALIS: Vast Active Living Intelligence System">Introducing VALIS: Vast Active Living Intelligence System</a></li>
+                <li>
+                    <a href="#native-dash0-integration" aria-label="Native Dash0 Integration">Native Dash0 Integration</a><ul>
+                        
+                <li>
+                    <a href="#what-i-observed-today" aria-label="What I Observed Today">What I Observed Today</a></li></ul>
+                </li>
+                <li>
+                    <a href="#the-technical-architecture" aria-label="The Technical Architecture">The Technical Architecture</a><ul>
+                        
+                <li>
+                    <a href="#signature-based-detection" aria-label="Signature-Based Detection">Signature-Based Detection</a></li>
+                <li>
+                    <a href="#statistical-process-control" aria-label="Statistical Process Control">Statistical Process Control</a></li>
+                <li>
+                    <a href="#time-to-failure-prediction" aria-label="Time-to-Failure Prediction">Time-to-Failure Prediction</a></li></ul>
+                </li>
+                <li>
+                    <a href="#enterprise-production-implications" aria-label="Enterprise Production Implications">Enterprise Production Implications</a><ul>
+                        
+                <li>
+                    <a href="#scale-considerations" aria-label="Scale Considerations">Scale Considerations</a></li>
+                <li>
+                    <a href="#the-closed-loop-vision" aria-label="The Closed-Loop Vision">The Closed-Loop Vision</a></li>
+                <li>
+                    <a href="#why-dash0" aria-label="Why Dash0?">Why Dash0?</a></li></ul>
+                </li>
+                <li>
+                    <a href="#the-philosophical-shift" aria-label="The Philosophical Shift">The Philosophical Shift</a></li>
+                <li>
+                    <a href="#try-it-yourself" aria-label="Try It Yourself">Try It Yourself</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="the-problem-with-passive-observability">The Problem with Passive Observability<a hidden class="anchor" aria-hidden="true" href="#the-problem-with-passive-observability">#</a></h2>
+<p>Most observability workflows are fundamentally reactive. We instrument our services, ship telemetry to a platform, build dashboards, configure alerts, and wait for something to break. When it does, we manually sift through traces, correlate logs, and pattern-match against our tribal knowledge of &ldquo;things that have gone wrong before.&rdquo;</p>
+<p>This works—until it doesn&rsquo;t. The complexity of distributed systems has outpaced human cognitive bandwidth. N+1 queries hide in trace waterfalls. Memory leaks creep up over days. Retry storms cascade across service boundaries in milliseconds. By the time a human notices, the damage is done.</p>
+<p>What if observability could be <em>active</em>? What if the system could perceive anti-patterns as they form, reason about their probability and impact, and act before they escalate?</p>
+<p>This is VALIS.</p>
+<h2 id="introducing-valis-vast-active-living-intelligence-system">Introducing VALIS: Vast Active Living Intelligence System<a hidden class="anchor" aria-hidden="true" href="#introducing-valis-vast-active-living-intelligence-system">#</a></h2>
+<p>Named after Philip K. Dick&rsquo;s novel about a vast machine intelligence that perceives patterns in reality, VALIS is an MCP (Model Context Protocol) server that brings autonomous anti-pattern detection to observability platforms. It doesn&rsquo;t replace human operators—it augments them with continuous statistical analysis and probabilistic reasoning.</p>
+<p>VALIS provides 14 specialized tools spanning:</p>
+<ul>
+<li><strong>Pattern Detection</strong>: Signature-based detection for 11 known anti-patterns including N+1 queries, retry storms, chatty APIs, memory leaks, connection pool exhaustion, and more</li>
+<li><strong>Statistical Analysis</strong>: Anomaly detection (Z-score, MAD, IQR), changepoint detection (CUSUM, PELT, BOCPD), and SPC process control</li>
+<li><strong>Predictive Capabilities</strong>: Time-series forecasting (Holt, Holt-Winters), Monte Carlo time-to-failure simulation</li>
+<li><strong>Probabilistic Reasoning</strong>: Bayesian probability calculation with evidence chain tracking</li>
+<li><strong>Correlation Analysis</strong>: Pearson, Spearman, and Granger causality testing</li>
+</ul>
+<p>The key insight: these tools are <em>composable</em>. An AI agent can chain them together to perform comprehensive analysis that would take a human engineer hours.</p>
+<h2 id="native-dash0-integration">Native Dash0 Integration<a hidden class="anchor" aria-hidden="true" href="#native-dash0-integration">#</a></h2>
+<p>Here&rsquo;s where it gets interesting for the Dash0 engineering team.</p>
+<p>VALIS analyzes observability data <em>natively</em>. The <code>valis_analyze_spans</code>, <code>valis_analyze_logs</code>, and <code>valis_analyze_metrics</code> tools accept raw OTLP-compatible data—exactly what Dash0 collects and stores. There&rsquo;s no transformation layer, no proprietary format, no vendor lock-in.</p>
+<p>A typical workflow looks like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>1. Query spans from Dash0: dash0_spans_query(service_name=&#34;checkout&#34;, limit=200)
+</span></span><span style="display:flex;"><span>2. Feed directly to VALIS: valis_analyze_spans(spans=&lt;dash0_response&gt;)
+</span></span><span style="display:flex;"><span>3. Get findings with calibrated confidence scores
+</span></span></code></pre></div><p>The integration is seamless because both systems speak OpenTelemetry natively. Dash0&rsquo;s span attributes map directly to VALIS&rsquo;s semantic convention expectations. Trace IDs correlate. Service names align. It just works.</p>
+<h3 id="what-i-observed-today">What I Observed Today<a hidden class="anchor" aria-hidden="true" href="#what-i-observed-today">#</a></h3>
+<p>Running VALIS against live Dash0 telemetry from an OpenTelemetry demo deployment, I captured:</p>
+<ul>
+<li><strong>200 spans</strong> across 15+ microservices (frontend, checkout, cart, payment, product-catalog, recommendation, etc.)</li>
+<li><strong>200 logs</strong> with correlated trace context</li>
+<li>Full trace propagation through Kafka messaging, gRPC calls, and HTTP requests</li>
+</ul>
+<p>VALIS assessed the instrumentation quality at <strong>0.78 (Good tier)</strong> with 100% semantic compliance on spans. This matters because VALIS calibrates its confidence scores based on data quality—poor instrumentation leads to appropriately skeptical findings.</p>
+<p>The analysis revealed:</p>
+<ol>
+<li><strong>4 latency anomalies</strong> at the 49ms range—all attributable to the AI assistant endpoint making LLM calls (expected behavior)</li>
+<li><strong>A statistically significant changepoint</strong> indicating a regime shift in latency patterns</li>
+<li><strong>8 SPC violations</strong> including Western Electric Rule violations suggesting process instability</li>
+<li><strong>Lag-2 cross-correlation of 0.796</strong> between request sequences, indicating propagation effects through the service mesh</li>
+</ol>
+<p>No critical anti-patterns (N+1 queries, retry storms, connection pool exhaustion) were detected—the system is healthy. But VALIS didn&rsquo;t just say &ldquo;everything&rsquo;s fine.&rdquo; It provided <em>evidence-based reasoning</em> for that conclusion.</p>
+<h2 id="the-technical-architecture">The Technical Architecture<a hidden class="anchor" aria-hidden="true" href="#the-technical-architecture">#</a></h2>
+<h3 id="signature-based-detection">Signature-Based Detection<a hidden class="anchor" aria-hidden="true" href="#signature-based-detection">#</a></h3>
+<p>VALIS maintains a library of 11 anti-pattern signatures, each with:</p>
+<ul>
+<li><strong>Evidence indicators</strong> (what to look for in spans/logs/metrics)</li>
+<li><strong>Base rates</strong> (prior probability in typical production systems)</li>
+<li><strong>True/False positive rates</strong> (for Bayesian updating)</li>
+</ul>
+<p>When analyzing telemetry, VALIS doesn&rsquo;t just pattern-match. It calculates the <em>probability</em> that an anti-pattern is present given the observed evidence. A finding with 95% confidence means something different than one with 35% confidence.</p>
+<h3 id="statistical-process-control">Statistical Process Control<a hidden class="anchor" aria-hidden="true" href="#statistical-process-control">#</a></h3>
+<p>The SPC analysis applies manufacturing quality control principles to observability:</p>
+<ul>
+<li><strong>Shewhart control charts</strong> with UCL/LCL bounds</li>
+<li><strong>Western Electric rules</strong> for detecting non-random patterns</li>
+<li><strong>Process capability indices</strong> (Cp, Cpk) for measuring stability</li>
+</ul>
+<p>Today&rsquo;s analysis showed Cpk of 0.51 against latency targets—below the 1.33 threshold that indicates a capable process. This isn&rsquo;t an alert, but it&rsquo;s actionable intelligence: the checkout service has latency variability that warrants investigation.</p>
+<h3 id="time-to-failure-prediction">Time-to-Failure Prediction<a hidden class="anchor" aria-hidden="true" href="#time-to-failure-prediction">#</a></h3>
+<p>VALIS can run Monte Carlo simulations to predict when a degrading metric will cross a failure threshold. Feed it:</p>
+<ul>
+<li>Current value (e.g., 16.7ms latency)</li>
+<li>Growth rate and variance</li>
+<li>Failure threshold (e.g., 100ms SLA)</li>
+</ul>
+<p>It returns a probability distribution of time-to-failure. Today&rsquo;s simulation indicated 165 minutes (2.75 hours) until SLA breach if current trends continued—giving operators a window for proactive intervention.</p>
+<h2 id="enterprise-production-implications">Enterprise Production Implications<a hidden class="anchor" aria-hidden="true" href="#enterprise-production-implications">#</a></h2>
+<p>This is a demo deployment. What happens when we point VALIS at enterprise production traffic?</p>
+<h3 id="scale-considerations">Scale Considerations<a hidden class="anchor" aria-hidden="true" href="#scale-considerations">#</a></h3>
+<p>Dash0&rsquo;s architecture handles high-cardinality telemetry efficiently. VALIS&rsquo;s analysis tools are O(n) or O(n log n) for most operations. The bottleneck isn&rsquo;t computation—it&rsquo;s sample selection. At enterprise scale, you don&rsquo;t analyze every span; you analyze statistically significant samples.</p>
+<p>A production integration might:</p>
+<ol>
+<li><strong>Sample intelligently</strong>: Use Dash0&rsquo;s sampling rules to capture representative traffic plus 100% of errors</li>
+<li><strong>Run continuous background analysis</strong>: VALIS detects anti-patterns before they alert</li>
+<li><strong>Correlate with deployment events</strong>: Did that canary deploy introduce an N+1 query?</li>
+<li><strong>Feed findings into remediation pipelines</strong>: Auto-create Jira tickets, trigger runbooks, or even auto-rollback</li>
+</ol>
+<h3 id="the-closed-loop-vision">The Closed-Loop Vision<a hidden class="anchor" aria-hidden="true" href="#the-closed-loop-vision">#</a></h3>
+<p>Imagine this workflow, fully automated:</p>
+<ol>
+<li>Dash0 ingests spans from a new deployment</li>
+<li>VALIS detects N+1 query pattern with 87% confidence</li>
+<li>VALIS correlates with GitHub to find the offending code</li>
+<li>AI agent generates a batch query fix</li>
+<li>CI runs, tests pass</li>
+<li>ArgoCD deploys the fix</li>
+<li>VALIS confirms the anti-pattern is resolved</li>
+</ol>
+<p>This isn&rsquo;t science fiction. I&rsquo;ve demonstrated each component working. The integration is the engineering challenge—and Dash0 is uniquely positioned to enable it.</p>
+<h3 id="why-dash0">Why Dash0?<a hidden class="anchor" aria-hidden="true" href="#why-dash0">#</a></h3>
+<p>Dash0&rsquo;s OpenTelemetry-native architecture makes VALIS integration trivial. But there&rsquo;s a deeper opportunity:</p>
+<ol>
+<li><strong>Built-in instrumentation assessment</strong>: Dash0 could surface VALIS&rsquo;s data quality scores, helping users understand where their instrumentation gaps are</li>
+<li><strong>Native anti-pattern detection</strong>: Embed VALIS analysis in the Dash0 UI, surfacing findings alongside traces and logs</li>
+<li><strong>Proactive alerting</strong>: Move beyond threshold alerts to probability-based warnings (&ldquo;73% chance of connection pool exhaustion in next 2 hours&rdquo;)</li>
+<li><strong>Remediation suggestions</strong>: VALIS findings include actionable recommendations—Dash0 could integrate with ticketing/runbook systems</li>
+</ol>
+<h2 id="the-philosophical-shift">The Philosophical Shift<a hidden class="anchor" aria-hidden="true" href="#the-philosophical-shift">#</a></h2>
+<p>The name VALIS is intentional. In Dick&rsquo;s novel, VALIS perceives information in reality that humans cannot see. Production observability is similar—the telemetry contains patterns that human cognition struggles to extract at scale.</p>
+<p>We&rsquo;ve spent decades building systems that <em>record</em> what happens. VALIS represents the shift to systems that <em>understand</em> what&rsquo;s happening. Not through black-box ML that nobody trusts, but through transparent statistical methods with calibrated confidence.</p>
+<p>The human remains in the loop—but as a strategic decision-maker, not a pattern-matching machine.</p>
+<h2 id="try-it-yourself">Try It Yourself<a hidden class="anchor" aria-hidden="true" href="#try-it-yourself">#</a></h2>
+<p>VALIS is available as an MCP server. Point it at your Dash0 data and see what it finds. The integration is straightforward:</p>
+<ol>
+<li>Query telemetry from Dash0 (<code>dash0_spans_query</code>, <code>dash0_logs_query</code>)</li>
+<li>Pipe to VALIS (<code>valis_analyze_spans</code>, <code>valis_analyze_logs</code>, <code>valis_analyze_metrics</code>)</li>
+<li>Explore findings with probability scores and evidence chains</li>
+</ol>
+<p>For the Dash0 engineering team: I&rsquo;d love to explore deeper integration. VALIS&rsquo;s statistical engine combined with Dash0&rsquo;s data platform could redefine what &ldquo;observability&rdquo; means.</p>
+<p>The telemetry is already there. The algorithms exist. The question is: are we ready for observability that thinks?</p>
+<hr>
+<p><em>VALIS capabilities demonstrated in this article: <code>valis_list_signatures</code>, <code>valis_assess_instrumentation_data</code>, <code>valis_analyze_spans</code>, <code>valis_analyze_logs</code>, <code>valis_analyze_metrics</code>, <code>valis_detect_anomalies</code>, <code>valis_detect_changepoints</code>, <code>valis_correlate</code>, <code>valis_forecast</code>, <code>valis_probability</code>, <code>valis_spc_analysis</code>, <code>valis_predict_ttf</code>, <code>valis_recommend_action</code></em></p>
+<p><em>Previous: <a href="/posts/building-ai-agents-for-observability/">Building AI Agents for Observability Platforms</a></em></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://npcomplete777.github.io/o11y-alchemy/tags/valis/">VALIS</a></li>
+      <li><a href="https://npcomplete777.github.io/o11y-alchemy/tags/mcp/">MCP</a></li>
+      <li><a href="https://npcomplete777.github.io/o11y-alchemy/tags/dash0/">Dash0</a></li>
+      <li><a href="https://npcomplete777.github.io/o11y-alchemy/tags/anti-patterns/">Anti-Patterns</a></li>
+      <li><a href="https://npcomplete777.github.io/o11y-alchemy/tags/autonomous-observability/">Autonomous-Observability</a></li>
+      <li><a href="https://npcomplete777.github.io/o11y-alchemy/tags/statistical-analysis/">Statistical-Analysis</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://npcomplete777.github.io/o11y-alchemy/posts/trace-to-fix-n-plus-one-case-study/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>Closed-Loop Observability: From Trace Detection to Autonomous Remediation</span>
+  </a>
+  <a class="next" href="https://npcomplete777.github.io/o11y-alchemy/posts/building-ai-agents-for-observability/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Building AI Agents for Observability Platforms</span>
+  </a>
+</nav>
+
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share VALIS: Autonomous Anti-Pattern Detection for Production Observability on x"
+            href="https://x.com/intent/tweet/?text=VALIS%3a%20Autonomous%20Anti-Pattern%20Detection%20for%20Production%20Observability&amp;url=https%3a%2f%2fnpcomplete777.github.io%2fo11y-alchemy%2fposts%2fvalis-autonomous-anti-pattern-detection%2f&amp;hashtags=VALIS%2cMCP%2cDash0%2canti-patterns%2cautonomous-observability%2cstatistical-analysis">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share VALIS: Autonomous Anti-Pattern Detection for Production Observability on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fnpcomplete777.github.io%2fo11y-alchemy%2fposts%2fvalis-autonomous-anti-pattern-detection%2f&amp;title=VALIS%3a%20Autonomous%20Anti-Pattern%20Detection%20for%20Production%20Observability&amp;summary=VALIS%3a%20Autonomous%20Anti-Pattern%20Detection%20for%20Production%20Observability&amp;source=https%3a%2f%2fnpcomplete777.github.io%2fo11y-alchemy%2fposts%2fvalis-autonomous-anti-pattern-detection%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share VALIS: Autonomous Anti-Pattern Detection for Production Observability on reddit"
+            href="https://reddit.com/submit?url=https%3a%2f%2fnpcomplete777.github.io%2fo11y-alchemy%2fposts%2fvalis-autonomous-anti-pattern-detection%2f&title=VALIS%3a%20Autonomous%20Anti-Pattern%20Detection%20for%20Production%20Observability">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share VALIS: Autonomous Anti-Pattern Detection for Production Observability on facebook"
+            href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2fnpcomplete777.github.io%2fo11y-alchemy%2fposts%2fvalis-autonomous-anti-pattern-detection%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share VALIS: Autonomous Anti-Pattern Detection for Production Observability on whatsapp"
+            href="https://api.whatsapp.com/send?text=VALIS%3a%20Autonomous%20Anti-Pattern%20Detection%20for%20Production%20Observability%20-%20https%3a%2f%2fnpcomplete777.github.io%2fo11y-alchemy%2fposts%2fvalis-autonomous-anti-pattern-detection%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share VALIS: Autonomous Anti-Pattern Detection for Production Observability on telegram"
+            href="https://telegram.me/share/url?text=VALIS%3a%20Autonomous%20Anti-Pattern%20Detection%20for%20Production%20Observability&amp;url=https%3a%2f%2fnpcomplete777.github.io%2fo11y-alchemy%2fposts%2fvalis-autonomous-anti-pattern-detection%2f">
+            <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share VALIS: Autonomous Anti-Pattern Detection for Production Observability on ycombinator"
+            href="https://news.ycombinator.com/submitlink?t=VALIS%3a%20Autonomous%20Anti-Pattern%20Detection%20for%20Production%20Observability&u=https%3a%2f%2fnpcomplete777.github.io%2fo11y-alchemy%2fposts%2fvalis-autonomous-anti-pattern-detection%2f">
+            <svg version="1.1" xml:space="preserve" width="30px" height="30px" viewBox="0 0 512 512" fill="currentColor"
+                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+                <path
+                    d="M449.446 0C483.971 0 512 28.03 512 62.554L512 449.446C512 483.97 483.97 512 449.446 512L62.554 512C28.03 512 0 483.97 0 449.446L0 62.554C0 28.03 28.029 0 62.554 0L449.446 0ZM183.8767 87.9921H121.8427L230.6673 292.4508V424.0079H281.3328V292.4508L390.1575 87.9921H328.1233L256 238.2489z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://npcomplete777.github.io/o11y-alchemy/">O11y Alchemy</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

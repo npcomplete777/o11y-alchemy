@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Migration on O11y Alchemy</title>
+    <link>https://npcomplete777.github.io/o11y-alchemy/tags/migration/</link>
+    <description>Recent content in Migration on O11y Alchemy</description>
+    <generator>Hugo -- 0.155.2</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 03 Jan 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://npcomplete777.github.io/o11y-alchemy/tags/migration/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Ontologies for Vendor-Agnostic Observability Migration</title>
+      <link>https://npcomplete777.github.io/o11y-alchemy/posts/observability-ontologies/</link>
+      <pubDate>Fri, 03 Jan 2025 00:00:00 +0000</pubDate>
+      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/observability-ontologies/</guid>
+      <description>Building semantic bridges between observability platforms for intelligent configuration migration</description>
+    </item>
+  </channel>
+</rss>

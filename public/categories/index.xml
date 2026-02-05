@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Categories on O11y Alchemy</title>
+    <link>https://npcomplete777.github.io/o11y-alchemy/categories/</link>
+    <description>Recent content in Categories on O11y Alchemy</description>
+    <generator>Hugo -- 0.155.2</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 04 Feb 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://npcomplete777.github.io/o11y-alchemy/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Architecture</title>
+      <link>https://npcomplete777.github.io/o11y-alchemy/categories/architecture/</link>
+      <pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate>
+      <guid>https://npcomplete777.github.io/o11y-alchemy/categories/architecture/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Case Study</title>
+      <link>https://npcomplete777.github.io/o11y-alchemy/categories/case-study/</link>
+      <pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate>
+      <guid>https://npcomplete777.github.io/o11y-alchemy/categories/case-study/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Industry</title>
+      <link>https://npcomplete777.github.io/o11y-alchemy/categories/industry/</link>
+      <pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate>
+      <guid>https://npcomplete777.github.io/o11y-alchemy/categories/industry/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Innovation</title>
+      <link>https://npcomplete777.github.io/o11y-alchemy/categories/innovation/</link>
+      <pubDate>Sun, 01 Feb 2026 00:00:00 +0000</pubDate>
+      <guid>https://npcomplete777.github.io/o11y-alchemy/categories/innovation/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Implementation</title>
+      <link>https://npcomplete777.github.io/o11y-alchemy/categories/implementation/</link>
+      <pubDate>Fri, 03 Jan 2025 00:00:00 +0000</pubDate>
+      <guid>https://npcomplete777.github.io/o11y-alchemy/categories/implementation/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>
