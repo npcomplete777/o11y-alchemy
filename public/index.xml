@@ -16,6 +16,13 @@
       <description>A demonstration of fully autonomous code remediation: VALIS detected a critical silent checkout failure pattern, generated an async Kafka fix, deployed via GitOps, and validated a 4,700x latency improvement—all without human intervention.</description>
     </item>
     <item>
+      <title>The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology</title>
+      <link>https://npcomplete777.github.io/o11y-alchemy/posts/geometry-of-failure/</link>
+      <pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate>
+      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/geometry-of-failure/</guid>
+      <description>Anti-patterns in distributed systems have geometric shapes that are invariant across languages, frameworks, and protocols. Empirical evidence from two production systems demonstrates how trace topology analysis enables language-agnostic anti-pattern detection.</description>
+    </item>
+    <item>
       <title>Why Autonomous Remediation Requires Open Architecture</title>
       <link>https://npcomplete777.github.io/o11y-alchemy/posts/open-architecture-autonomous-remediation/</link>
       <pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate>
@@ -70,16 +77,9 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://npcomplete777.github.io/o11y-alchemy/about/</guid>
       <description>&lt;h2 id=&#34;about-this-blog&#34;&gt;About This Blog&lt;/h2&gt;
-&lt;p&gt;&lt;strong&gt;O11y Alchemy&lt;/strong&gt; explores the intersection of agentic AI and observability—how AI agents can move beyond chatbots to actually operate infrastructure.&lt;/p&gt;
-&lt;p&gt;The name references the alchemical tradition of transmutation. Here, I&amp;rsquo;m transmuting fragmented observability tooling into unified, AI-accessible systems.&lt;/p&gt;
-&lt;h2 id=&#34;what-im-building&#34;&gt;What I&amp;rsquo;m Building&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Comprehensive AI agent infrastructure&lt;/strong&gt; for observability platforms—nearly 100 tools covering complete API surfaces&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Automated OpenTelemetry receiver generation&lt;/strong&gt; from API specifications—days of work compressed to minutes&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Semantic migration tooling&lt;/strong&gt; for cross-platform observability—understanding intent, not just syntax&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;MCP-based orchestration&lt;/strong&gt; that makes monolithic DevOps platforms obsolete&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;These aren&amp;rsquo;t concepts—they&amp;rsquo;re working systems with demonstrated results.&lt;/p&gt;</description>
+&lt;p&gt;&lt;strong&gt;O11y Alchemy&lt;/strong&gt; documents the emergence of autonomous observability—AI agents that can perceive anti-patterns in distributed systems, reason about their causes, implement fixes, deploy them through GitOps, and verify improvements. All without human intervention.&lt;/p&gt;
+&lt;p&gt;The name references the alchemical tradition of transmutation. I&amp;rsquo;m transmuting passive observability telemetry into active, intelligent systems that operate infrastructure.&lt;/p&gt;
+&lt;p&gt;This isn&amp;rsquo;t speculative. The case studies on this site document production systems where autonomous agents detected performance anti-patterns, generated code fixes, deployed them, and validated latency improvements ranging from 59% to 4,700x—all autonomously.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

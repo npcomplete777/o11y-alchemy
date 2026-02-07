@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="dark">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology | O11y Alchemy</title>
+<meta name="keywords" content="distributed-tracing, anti-patterns, trace-topology, OpenTelemetry, VALIS, geometric-detection, observability, autonomous-remediation">
+<meta name="description" content="Anti-patterns in distributed systems have geometric shapes that are invariant across languages, frameworks, and protocols. Empirical evidence from two production systems demonstrates how trace topology analysis enables language-agnostic anti-pattern detection.">
+<meta name="author" content="Aaron Jacobs">
+<link rel="canonical" href="https://npcomplete777.github.io/o11y-alchemy/posts/geometry-of-failure/">
+<link crossorigin="anonymous" href="/o11y-alchemy/assets/css/stylesheet.343cc480b9ffc8f04ccbe5e968ad674880cab773ec19905e93033065c1e7a804.css" integrity="sha256-NDzEgLn/yPBMy&#43;XpaK1nSIDKt3PsGZBekwMwZcHnqAQ=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://npcomplete777.github.io/o11y-alchemy/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://npcomplete777.github.io/o11y-alchemy/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://npcomplete777.github.io/o11y-alchemy/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://npcomplete777.github.io/o11y-alchemy/apple-touch-icon.png">
+<link rel="mask-icon" href="https://npcomplete777.github.io/o11y-alchemy/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://npcomplete777.github.io/o11y-alchemy/posts/geometry-of-failure/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "light") {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://npcomplete777.github.io/o11y-alchemy/posts/geometry-of-failure/">
+  <meta property="og:site_name" content="O11y Alchemy">
+  <meta property="og:title" content="The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology">
+  <meta property="og:description" content="Anti-patterns in distributed systems have geometric shapes that are invariant across languages, frameworks, and protocols. Empirical evidence from two production systems demonstrates how trace topology analysis enables language-agnostic anti-pattern detection.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-02-04T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-02-04T00:00:00+00:00">
+    <meta property="article:tag" content="Distributed-Tracing">
+    <meta property="article:tag" content="Anti-Patterns">
+    <meta property="article:tag" content="Trace-Topology">
+    <meta property="article:tag" content="Opentelemetry">
+    <meta property="article:tag" content="VALIS">
+    <meta property="article:tag" content="Geometric-Detection">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology">
+<meta name="twitter:description" content="Anti-patterns in distributed systems have geometric shapes that are invariant across languages, frameworks, and protocols. Empirical evidence from two production systems demonstrates how trace topology analysis enables language-agnostic anti-pattern detection.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://npcomplete777.github.io/o11y-alchemy/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology",
+      "item": "https://npcomplete777.github.io/o11y-alchemy/posts/geometry-of-failure/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology",
+  "name": "The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology",
+  "description": "Anti-patterns in distributed systems have geometric shapes that are invariant across languages, frameworks, and protocols. Empirical evidence from two production systems demonstrates how trace topology analysis enables language-agnostic anti-pattern detection.",
+  "keywords": [
+    "distributed-tracing", "anti-patterns", "trace-topology", "OpenTelemetry", "VALIS", "geometric-detection", "observability", "autonomous-remediation"
+  ],
+  "articleBody": " “The real cycle you’re working on is a cycle called yourself.” — Robert M. Pirsig, Zen and the Art of Motorcycle Maintenance\nThe Claim I’m going to make a claim that I haven’t seen anyone else make explicitly, and then I’m going to prove it with two empirical case studies from production systems.\nAnti-patterns in distributed systems produce characteristic geometric signatures in trace topology space. These signatures are invariant across programming languages, communication protocols, and observability platforms. A system that can classify trace geometry can detect anti-patterns without knowing anything about the underlying implementation.\nThis isn’t a theory. I’ve demonstrated it twice, on two completely different technology stacks, using the same detection framework. The detector didn’t change. The languages changed. The protocols changed. The platforms changed. The geometry was identical.\nWhat Do I Mean by “Trace Geometry”? A distributed trace is a tree. Each node (span) represents a unit of work. Edges represent causal relationships — “this span caused that span.” Each node carries metadata: a name, a duration, a service attribution, and a status.\nMost observability practice treats traces as debugging artifacts. You look at a trace when something goes wrong. You find the slow span. You fix it. This is like using a microscope to look at one cell at a time.\nBut traces have topology. The tree has a shape. That shape has measurable properties:\nFan-out: How many children does a parent span have? Homogeneity: Are the children the same type of operation? Temporality: Are children sequential or concurrent? Scaling behavior: Does fan-out vary with input size? Depth: How deep is the call chain? These properties define a point in what I’m calling trace topology space — a multi-dimensional space where each axis is a structural property of the trace tree. Different executions of the same code path produce points that cluster together in this space. Different anti-patterns produce clusters in different regions.\nThe insight: these regions are the same regardless of what language generated the trace.\nAn N+1 query in Go producing gRPC spans occupies the same region of trace topology space as an N+1 query in Python producing SQL spans. The implementation details are different. The geometry is identical.\nCase Study 1: The Checkout Service (Go + gRPC) The first detection occurred in the checkout service of the OpenTelemetry Astronomy Shop, a polyglot microservices application running on k3s and exporting OTLP telemetry to Dash0.\nVALIS — my autonomous observability system built on Claude with MCP-integrated tooling — queried Dash0 for recent spans from the checkout service and found this structure:\nPlaceOrder (297ms) └─ prepareOrderItemsAndShippingQuoteFromCart (132ms) ├─ CartService/GetCart (32ms) ← 1 call ├─ ProductCatalogService/GetProduct (14ms) ← Item 1 ├─ CurrencyService/Convert (6ms) ← Item 1 ├─ ProductCatalogService/GetProduct (8ms) ← Item 2 ├─ CurrencyService/Convert (13ms) ← Item 2 ├─ ProductCatalogService/GetProduct (5ms) ← Item 3 └─ CurrencyService/Convert (9ms) ← Item 3 The structural properties:\nProperty Value Fan-out from parent 2N + 1 (scales with cart size) Child homogeneity Repeating pair: GetProduct, Convert Temporal pattern Sequential (non-overlapping) Scaling behavior Linear with input cardinality Protocol gRPC Language Go Data layer Remote service calls The source code confirmed the geometry. In src/checkout/main.go, the prepOrderItems function iterated over cart items in a for loop, making one GetProduct and one Convert call per iteration. Sequential. Unbatched. O(2N+2).\nThe fix: batch RPC methods (GetProducts, ConvertCurrencies) that collapsed the fan-out to a constant 3 calls regardless of cart size. Post-deployment telemetry confirmed a 59% latency reduction.\nThe full detection-to-verification cycle — perceive, reason, act, verify — was executed autonomously. The commit is at npcomplete777/opentelemetry-demo, branch fix/n-plus-one-checkout-batch.\nCase Study 2: The Async Kafka Failure (Go + Kafka) The second detection was structurally different but revealed through the same geometric analysis.\nVALIS queried Dash0 for checkout spans and found an anomalous trace:\nPlaceOrder (165,084ms) ← 2.75 MINUTES ├─ prepareOrderItems (49ms) ← Fast (batch fix working) ├─ ChargePayment (3ms) ← Fast ├─ SendConfirmation (7ms) ← Fast ├─ EmptyCart (2ms) ← Fast └─ sendToPostProcessor (165,000ms) ← BLOCKING KAFKA WRITE └─ orders publish (142,732ms) └─ Kafka ack wait... The structural properties:\nProperty Value Fan-out from parent N children, one dominant Child homogeneity Heterogeneous — different operations Temporal pattern Sequential, with one extreme outlier Duration distribution Bimodal: fast cluster + extreme tail Protocol Kafka (async messaging used synchronously) Language Go Data layer Message broker This is a different anti-pattern — synchronous blocking on an asynchronous operation — but the detection method was identical: analyze the trace tree’s structural properties, classify the geometry, identify the pathology.\nThe source code confirmed it. In sendToPostProcessor, the checkout service was blocking on a Kafka acknowledgment select statement, turning a fire-and-forget operation into a synchronous call that could block for minutes. Meanwhile, the payment was charged, the confirmation email was sent, and the user saw a 504 timeout believing their order failed.\nThe fix: async fire-and-forget with background acknowledgment handling. Post-deployment: 4,700x latency improvement, from 165 seconds to 35 milliseconds. Zero human intervention. PR #3 on the same repository.\nThe Geometry Is the Invariant Now look at what’s the same across both cases and what’s different:\nDimension Case 1: N+1 gRPC Case 2: Kafka Block Language Go Go Protocol gRPC Kafka Anti-pattern N+1 Query Sync-over-Async Fan-out 2N+1 (linear scaling) N (one dominant child) Homogeneity Repeating pairs Heterogeneous Temporality Sequential, uniform Sequential, one outlier Duration dist. Uniform, scaling Bimodal, extreme tail Detection method Trace topology analysis Trace topology analysis Detection framework VALIS Bayesian engine VALIS Bayesian engine The anti-patterns are different. The geometries are different. But the detection framework is the same. It operates on structural properties of the trace tree — fan-out, homogeneity, temporality, duration distribution — and classifies the geometry against known signatures.\nThe framework didn’t need to know it was looking at gRPC calls in Case 1 and Kafka writes in Case 2. It didn’t need to read Go source code. It didn’t need to understand protocol buffers or Kafka producer semantics. It classified shapes, not implementations.\nThis is the key insight: anti-patterns have geometric signatures that are independent of implementation details.\nBeyond N+1: A Taxonomy of Trace Geometries If anti-patterns have characteristic geometries, then we can define a taxonomy — a classification system based on structural properties of trace trees.\nHere are the signatures I’ve identified, expressed as regions in trace topology space:\nN+1 Query / Chatty API\nFan-out: Linear with input cardinality Homogeneity: High (repeating operation type) Temporality: Sequential Signature: “Comb” — many identical teeth hanging from one spine Sync-over-Async\nFan-out: Moderate, one dominant child Homogeneity: Low (mixed operation types) Duration distribution: Extreme bimodal Signature: “Lollipop” — small cluster of fast operations, one massively long stem Retry Storm\nFan-out: Repeated calls to same target service Temporality: Sequential with increasing inter-span gaps Terminal state: Timeout or error Signature: “Staircase” — descending steps of increasing latency Circuit Breaker Oscillation\nDuration distribution: Periodic alternation between fast-fail and slow-fail Temporal pattern: Oscillating signal Signature: “Sawtooth” — repeating rise-and-crash pattern Connection Pool Exhaustion\nDuration distribution: Bimodal (immediate vs. wait-timeout) Degradation: Progressive — healthy cluster shrinks, waiting cluster grows Signature: “Hourglass” — flow constricts at a single resource bottleneck Each of these geometries is detectable through the same structural analysis framework. The Bayesian evidence streams differ — different properties matter for different patterns — but the methodology is invariant:\nExtract structural properties from trace topology Classify against known geometric signatures Calculate confidence via Bayesian inference Act on high-confidence detections Language-Specific Anti-Patterns: The Strongest Evidence There’s an obvious objection to the universality claim: what about anti-patterns that only exist in specific runtimes? .NET’s SynchronizationContext deadlocks. Java’s classloader circular initialization. Python’s GIL contention under asyncio. These are mechanisms unique to a single language. Surely they break the geometric framework?\nThey don’t. They strengthen it.\nConsider the .NET async deadlock — the classic case where a developer calls .Result or .Wait() on a Task inside a synchronization context, causing the continuation to wait for a thread that’s blocked waiting for the continuation. This is a .NET-specific mechanism. Java doesn’t have SynchronizationContext. Go doesn’t have colored functions. The bug can only occur in .NET code.\nBut what does it look like in the traces?\nA parent span starts. It invokes an async method, producing a child span. That child span either never completes or completes after an absurd duration — a timeout. Meanwhile, no other child spans appear, despite async methods being invoked. The trace tree shows a parent blocked on a single non-completing child with zero concurrency despite async invocation.\nThat’s a geometry. And it’s the same geometry you’d see from a Python asyncio deadlock caused by loop.run_until_complete() inside a running event loop, or a Kotlin coroutine deadlock from runBlocking inside a coroutine scope, or a Java CompletableFuture.get() blocking the fork-join pool. Different languages, different mechanisms, identical trace shape: parent blocked on non-completing async child, zero concurrent work, eventual timeout.\nThe language-specific mechanism determines why the deadlock occurs. The geometry determines that it occurs — and the geometry is universal.\nThis reveals a clean separation into three layers:\nLayer 1: Geometry (universal). The structural properties of the trace tree — fan-out, temporal pattern, duration distribution, concurrency characteristics. This is where detection happens. Language-agnostic. Framework-agnostic. Vendor-agnostic.\nLayer 2: Semantics (language-aware). The span attributes that explain the geometry — code.function, thread.id, runtime.name, rpc.system. OpenTelemetry semantic conventions give us this layer. When the geometric detector flags a “deadlocked async” shape, the semantic attributes narrow the diagnosis: “this is a .NET service, the child span is GetResultAsync, the thread ID is the same for parent and child — probable SynchronizationContext capture.”\nLayer 3: Remediation (implementation-specific). The actual code fix. In .NET: replace .Result with await, or use ConfigureAwait(false). In Python: restructure to avoid nested event loops. In Java: avoid get() on the common fork-join pool. Each language has its own fix, but the fix is only needed because the geometry was detected — and the geometry was detected without knowing the language.\nThis layering means the signature library becomes hierarchical:\nDeadlocked Async (universal geometry) ├── .NET: SynchronizationContext capture (.Result / .Wait()) ├── Java: CompletableFuture.get() on ForkJoinPool ├── Python: run_until_complete inside running loop ├── Kotlin: runBlocking inside coroutine scope └── [unknown runtime]: geometry detected, no specific diagnosis That last entry is the most powerful. When the geometric detector encounters the “deadlocked async” shape in a language it has no specific refinement for — a new Rust service using tokio, an Erlang process with a receive deadlock, a Zig experiment — it can still detect the problem from the shape alone. It can say: “this trace shows a blocked parent waiting on a non-completing async child with zero concurrency. Something is deadlocked. Here’s the span. Here’s the service. Investigate.”\nThat capability — detecting unknown-language anti-patterns from geometry alone — doesn’t exist in any APM tool on the market. Every APM vendor maintains separate agents for .NET, Java, Python, Go, each with its own detection logic, its own pattern library, its own blind spots. The geometric approach replaces all of them with one classifier that operates on trace topology.\nAnd it extends to every language-specific pathology I’ve examined:\nJava classloader deadlocks produce a dependency cycle visible as two concurrent spans that both stall at the same timestamp — the same geometry as a database deadlock or distributed lock conflict. .NET ThreadPool starvation produces progressively increasing queue times visible as growing gaps between parent span start and child span start — the same geometry as connection pool exhaustion. Python GIL contention under async load produces serialized execution of nominally concurrent operations — the same geometry as a mutex bottleneck in any language. Go goroutine leaks produce fan-out that increases over time without corresponding fan-in — the same geometry as a resource leak in any runtime. In every case, the language-specific mechanism is the cause. The trace geometry is the symptom. And symptoms have shapes that transcend their causes.\nLanguage-specific anti-patterns aren’t exceptions to the geometric framework. They’re the strongest evidence for it — because they prove that even mechanisms unique to a single runtime still produce universally recognizable trace shapes.\nWhy This Hasn’t Been Said Before The pieces of this observation exist independently in the literature:\nBrendan Gregg’s flame graphs proved that performance problems have visual signatures — you can see the pathology in the shape. But flame graphs are single-process. They don’t capture distributed topology.\nCharity Majors and the Honeycomb team proved that high-cardinality, high-dimensionality trace data enables novel debugging. But Honeycomb’s interaction model is human-driven query exploration, not automated geometric classification.\nThe OpenTelemetry project standardized span semantics across languages and frameworks, making cross-platform structural analysis possible. But OTel focuses on data collection and export, not topological analysis.\nThe SEI at Carnegie Mellon defined architectural anti-patterns in graph-theoretic terms. But they work at the static dependency level, not runtime trace topology.\nNobody connected these pieces because, until recently, there was no agent that could operate on trace geometry programmatically. Humans could see shapes in flame graphs. Monitoring tools could apply threshold rules. But nothing could ingest a trace tree, measure its topological properties, run probabilistic classification, and act on the result.\nThe theoretical framework wasn’t useful without an execution engine. So nobody formalized it.\nI built the execution engine first. The theory followed.\nThe Execution Engine: VALIS VALIS (Vast Active Living Intelligence System) is an autonomous observability platform built on an LLM-based reasoning agent. VALIS orchestrates across observability platforms, infrastructure management, source code repositories, and deployment pipelines through MCP (Model Context Protocol) servers, with a probabilistic classification engine providing Bayesian inference over trace topology features.\nThe MCP architecture is what makes geometric detection possible. Each MCP server exposes a specific capability as a tool the reasoning agent can invoke. The agent orchestrates across tools — querying telemetry, analyzing topology with the classification engine, correlating to source code, deploying fixes, and verifying improvements.\nNo single tool detects anti-patterns. The detection is an emergent property of connected tools orchestrated by a reasoning agent. Observability platforms provide perception. The classification engine provides probabilistic inference. Source repositories provide code correlation. Deployment systems provide remediation. The reasoning agent provides the coordination that connects them.\nThis emergence is why the framework generalizes across anti-pattern types. The agent doesn’t follow a script that says “count GetProduct calls.” It reasons: “this trace tree has high fan-out, homogeneous children, sequential execution, and linear scaling. That geometric signature matches the N+1 pattern with high Bayesian confidence.”\nChange the children from GetProduct to SQL queries to HTTP calls to Kafka writes — the geometry doesn’t change. The confidence doesn’t change. The detection doesn’t change.\nThe Entropy Connection There’s a deeper principle underneath the geometry.\nAn anti-pattern, in thermodynamic terms, is a code path that passes through unnecessarily many states to achieve an outcome reachable through fewer states. The N+1 pattern makes 2N+2 RPC calls when 3 would suffice. Each call adds network round trips, connection states, failure modes, timing interleavings. The configuration space of possible system states during execution is vastly larger than necessary.\nThe batch fix collapses that configuration space. Fewer calls, fewer states, fewer ways for things to go wrong. The trace tree shrinks. The geometry simplifies.\nAnti-pattern detection through trace geometry is, at its core, entropy measurement. High fan-out with sequential homogeneous children is high entropy — many redundant microstates. The geometric signature is the entropy signature.\nFixing the anti-pattern reduces local entropy. The system’s behavior becomes more predictable. The trace tree occupies a smaller, tighter region of topology space.\nVALIS is, in effect, a Maxwell’s Demon for distributed systems — observing microstates (spans), acquiring information (Bayesian inference), and acting to reduce local entropy (code fixes), all while exporting the entropic cost into computation and token consumption.\nImplications If anti-patterns have language-agnostic geometric signatures, several things follow:\nDetection scales across polyglot architectures. The OpenTelemetry Astronomy Shop has services in Go, Python, JavaScript, Java, Ruby, C++, Rust, PHP, .NET, Erlang, and Kotlin. A geometric detector doesn’t care. Spans are spans. Trees are trees. Shapes are shapes.\nDetection is vendor-agnostic. I proved the N+1 detection on Dash0 with OTLP data. The same framework works on any backend that exposes trace data through a queryable interface — Honeycomb, Jaeger, Tempo, Datadog, Dynatrace. The geometry exists in the trace, not in the platform.\nLanguage-specific anti-patterns become detectable without language-specific agents. A .NET SynchronizationContext deadlock produces the same trace geometry as a Python asyncio deadlock. The geometric classifier finds both. Language-specific refinements improve the diagnosis, but the detection itself is universal. This eliminates the need for per-language APM agents with separate detection logic — one geometric classifier replaces them all.\nNew anti-patterns can be discovered empirically. If you can measure trace topology, you can cluster traces by geometric similarity and discover anti-pattern signatures you didn’t know to look for. The taxonomy doesn’t need to be predefined. It can be learned from production traffic.\nThe human role shifts from pattern-matching to architecture. If an agent can detect geometric signatures and implement fixes autonomously, engineers stop being debuggers and become architects of the systems that enable autonomous detection. The leverage changes by orders of magnitude.\nWhat This Means for Observability The observability industry has spent a decade arguing about three pillars versus events versus traces versus metrics. The geometric perspective dissolves most of that debate.\nWhat matters is the topology. If your telemetry preserves parent-child relationships, timing, service attribution, and operation names — if it preserves the shape of execution — then geometric analysis can extract anti-pattern signatures regardless of how you label the data.\nTraces preserve topology. Metrics don’t. Logs don’t (unless correlated). This is why Charity Majors has been right about traces for years, but for a reason she may not have fully articulated: traces are the only telemetry type that preserves the geometric structure of distributed execution.\nAnd geometric structure is where the anti-patterns live.\nConclusion I’ve demonstrated, with two empirical case studies on production systems, that anti-patterns in distributed systems produce characteristic geometric signatures in trace topology space. These signatures are invariant across programming languages, communication protocols, and observability platforms. Even anti-patterns rooted in language-specific runtime mechanisms — .NET synchronization context deadlocks, Java classloader cycles, Python GIL contention — produce trace geometries that are universally recognizable, because the symptom has a shape that transcends its cause.\nThe N+1 pattern in Go gRPC calls looks the same as an N+1 pattern in any other language and protocol. The sync-over-async pattern in Kafka has a distinct but equally recognizable geometry. Both were detected by the same framework operating on structural properties of trace trees — fan-out, homogeneity, temporality, duration distribution — without knowledge of the underlying implementation.\nThis isn’t monitoring. This isn’t dashboarding. This isn’t even observability in the traditional sense.\nThis is computational geometry applied to distributed system behavior.\nThe traces are the substrate. The shapes are the signal. The agent is the classifier.\nAnd the shapes are universal.\nAaron Jacobs is a Principal Technical Consultant specializing in observability and AI. He is the creator of VALIS (Vast Active Living Intelligence System), an autonomous observability platform. His previous posts on closed-loop observability are available at o11y-alchemy.com. The detection framework, fixes, and deployment history are publicly available at github.com/npcomplete777/opentelemetry-demo.\nThe code commits are the proof. The geometry is the insight. The question isn’t whether this is possible — it’s who will formalize it next.\n",
+  "wordCount" : "3192",
+  "inLanguage": "en",
+  "datePublished": "2026-02-04T00:00:00Z",
+  "dateModified": "2026-02-04T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "Aaron Jacobs"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://npcomplete777.github.io/o11y-alchemy/posts/geometry-of-failure/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "O11y Alchemy",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://npcomplete777.github.io/o11y-alchemy/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://npcomplete777.github.io/o11y-alchemy/" accesskey="h" title="O11y Alchemy (Alt + H)">O11y Alchemy</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://npcomplete777.github.io/o11y-alchemy/posts/" title="Articles">
+                    <span>Articles</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://npcomplete777.github.io/o11y-alchemy/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://npcomplete777.github.io/o11y-alchemy/about/" title="About">
+                    <span>About</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://npcomplete777.github.io/o11y-alchemy/">Home</a>&nbsp;»&nbsp;<a href="https://npcomplete777.github.io/o11y-alchemy/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology
+    </h1>
+    <div class="post-description">
+      Anti-patterns in distributed systems have geometric shapes that are invariant across languages, frameworks, and protocols. Empirical evidence from two production systems demonstrates how trace topology analysis enables language-agnostic anti-pattern detection.
+    </div>
+    <div class="post-meta"><span title='2026-02-04 00:00:00 +0000 UTC'>February 4, 2026</span>&nbsp;·&nbsp;<span>15 min</span>&nbsp;·&nbsp;<span>Aaron Jacobs</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#the-claim" aria-label="The Claim">The Claim</a></li>
+                <li>
+                    <a href="#what-do-i-mean-by-trace-geometry" aria-label="What Do I Mean by &ldquo;Trace Geometry&rdquo;?">What Do I Mean by &ldquo;Trace Geometry&rdquo;?</a></li>
+                <li>
+                    <a href="#case-study-1-the-checkout-service-go--grpc" aria-label="Case Study 1: The Checkout Service (Go &#43; gRPC)">Case Study 1: The Checkout Service (Go + gRPC)</a></li>
+                <li>
+                    <a href="#case-study-2-the-async-kafka-failure-go--kafka" aria-label="Case Study 2: The Async Kafka Failure (Go &#43; Kafka)">Case Study 2: The Async Kafka Failure (Go + Kafka)</a></li>
+                <li>
+                    <a href="#the-geometry-is-the-invariant" aria-label="The Geometry Is the Invariant">The Geometry Is the Invariant</a></li>
+                <li>
+                    <a href="#beyond-n1-a-taxonomy-of-trace-geometries" aria-label="Beyond N&#43;1: A Taxonomy of Trace Geometries">Beyond N+1: A Taxonomy of Trace Geometries</a></li>
+                <li>
+                    <a href="#language-specific-anti-patterns-the-strongest-evidence" aria-label="Language-Specific Anti-Patterns: The Strongest Evidence">Language-Specific Anti-Patterns: The Strongest Evidence</a></li>
+                <li>
+                    <a href="#why-this-hasnt-been-said-before" aria-label="Why This Hasn&rsquo;t Been Said Before">Why This Hasn&rsquo;t Been Said Before</a></li>
+                <li>
+                    <a href="#the-execution-engine-valis" aria-label="The Execution Engine: VALIS">The Execution Engine: VALIS</a></li>
+                <li>
+                    <a href="#the-entropy-connection" aria-label="The Entropy Connection">The Entropy Connection</a></li>
+                <li>
+                    <a href="#implications" aria-label="Implications">Implications</a></li>
+                <li>
+                    <a href="#what-this-means-for-observability" aria-label="What This Means for Observability">What This Means for Observability</a></li>
+                <li>
+                    <a href="#conclusion" aria-label="Conclusion">Conclusion</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><blockquote>
+<p>&ldquo;The real cycle you&rsquo;re working on is a cycle called yourself.&rdquo; — Robert M. Pirsig, <em>Zen and the Art of Motorcycle Maintenance</em></p>
+</blockquote>
+<h2 id="the-claim">The Claim<a hidden class="anchor" aria-hidden="true" href="#the-claim">#</a></h2>
+<p>I&rsquo;m going to make a claim that I haven&rsquo;t seen anyone else make explicitly, and then I&rsquo;m going to prove it with two empirical case studies from production systems.</p>
+<p><strong>Anti-patterns in distributed systems produce characteristic geometric signatures in trace topology space. These signatures are invariant across programming languages, communication protocols, and observability platforms. A system that can classify trace geometry can detect anti-patterns without knowing anything about the underlying implementation.</strong></p>
+<p>This isn&rsquo;t a theory. I&rsquo;ve demonstrated it twice, on two completely different technology stacks, using the same detection framework. The detector didn&rsquo;t change. The languages changed. The protocols changed. The platforms changed. The geometry was identical.</p>
+<h2 id="what-do-i-mean-by-trace-geometry">What Do I Mean by &ldquo;Trace Geometry&rdquo;?<a hidden class="anchor" aria-hidden="true" href="#what-do-i-mean-by-trace-geometry">#</a></h2>
+<p>A distributed trace is a tree. Each node (span) represents a unit of work. Edges represent causal relationships — &ldquo;this span caused that span.&rdquo; Each node carries metadata: a name, a duration, a service attribution, and a status.</p>
+<p>Most observability practice treats traces as debugging artifacts. You look at a trace when something goes wrong. You find the slow span. You fix it. This is like using a microscope to look at one cell at a time.</p>
+<p>But traces have <em>topology</em>. The tree has a shape. That shape has measurable properties:</p>
+<ul>
+<li><strong>Fan-out</strong>: How many children does a parent span have?</li>
+<li><strong>Homogeneity</strong>: Are the children the same type of operation?</li>
+<li><strong>Temporality</strong>: Are children sequential or concurrent?</li>
+<li><strong>Scaling behavior</strong>: Does fan-out vary with input size?</li>
+<li><strong>Depth</strong>: How deep is the call chain?</li>
+</ul>
+<p>These properties define a point in what I&rsquo;m calling <em>trace topology space</em> — a multi-dimensional space where each axis is a structural property of the trace tree. Different executions of the same code path produce points that cluster together in this space. Different anti-patterns produce clusters in different regions.</p>
+<p>The insight: <strong>these regions are the same regardless of what language generated the trace.</strong></p>
+<p>An N+1 query in Go producing gRPC spans occupies the same region of trace topology space as an N+1 query in Python producing SQL spans. The implementation details are different. The geometry is identical.</p>
+<h2 id="case-study-1-the-checkout-service-go--grpc">Case Study 1: The Checkout Service (Go + gRPC)<a hidden class="anchor" aria-hidden="true" href="#case-study-1-the-checkout-service-go--grpc">#</a></h2>
+<p>The first detection occurred in the checkout service of the OpenTelemetry Astronomy Shop, a polyglot microservices application running on k3s and exporting OTLP telemetry to Dash0.</p>
+<p>VALIS — my autonomous observability system built on Claude with MCP-integrated tooling — queried Dash0 for recent spans from the checkout service and found this structure:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>PlaceOrder (297ms)
+</span></span><span style="display:flex;"><span>└─ prepareOrderItemsAndShippingQuoteFromCart (132ms)
+</span></span><span style="display:flex;"><span>   ├─ CartService/GetCart (32ms)               ← 1 call
+</span></span><span style="display:flex;"><span>   ├─ ProductCatalogService/GetProduct (14ms)  ← Item 1
+</span></span><span style="display:flex;"><span>   ├─ CurrencyService/Convert (6ms)            ← Item 1
+</span></span><span style="display:flex;"><span>   ├─ ProductCatalogService/GetProduct (8ms)   ← Item 2
+</span></span><span style="display:flex;"><span>   ├─ CurrencyService/Convert (13ms)           ← Item 2
+</span></span><span style="display:flex;"><span>   ├─ ProductCatalogService/GetProduct (5ms)   ← Item 3
+</span></span><span style="display:flex;"><span>   └─ CurrencyService/Convert (9ms)            ← Item 3
+</span></span></code></pre></div><p>The structural properties:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Property</th>
+          <th>Value</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Fan-out from parent</td>
+          <td>2N + 1 (scales with cart size)</td>
+      </tr>
+      <tr>
+          <td>Child homogeneity</td>
+          <td>Repeating pair: GetProduct, Convert</td>
+      </tr>
+      <tr>
+          <td>Temporal pattern</td>
+          <td>Sequential (non-overlapping)</td>
+      </tr>
+      <tr>
+          <td>Scaling behavior</td>
+          <td>Linear with input cardinality</td>
+      </tr>
+      <tr>
+          <td>Protocol</td>
+          <td>gRPC</td>
+      </tr>
+      <tr>
+          <td>Language</td>
+          <td>Go</td>
+      </tr>
+      <tr>
+          <td>Data layer</td>
+          <td>Remote service calls</td>
+      </tr>
+  </tbody>
+</table>
+<p>The source code confirmed the geometry. In <code>src/checkout/main.go</code>, the <code>prepOrderItems</code> function iterated over cart items in a <code>for</code> loop, making one <code>GetProduct</code> and one <code>Convert</code> call per iteration. Sequential. Unbatched. O(2N+2).</p>
+<p>The fix: batch RPC methods (<code>GetProducts</code>, <code>ConvertCurrencies</code>) that collapsed the fan-out to a constant 3 calls regardless of cart size. Post-deployment telemetry confirmed a 59% latency reduction.</p>
+<p>The full detection-to-verification cycle — perceive, reason, act, verify — was executed autonomously. The commit is at <a href="https://github.com/npcomplete777/opentelemetry-demo">npcomplete777/opentelemetry-demo</a>, branch <code>fix/n-plus-one-checkout-batch</code>.</p>
+<h2 id="case-study-2-the-async-kafka-failure-go--kafka">Case Study 2: The Async Kafka Failure (Go + Kafka)<a hidden class="anchor" aria-hidden="true" href="#case-study-2-the-async-kafka-failure-go--kafka">#</a></h2>
+<p>The second detection was structurally different but revealed through the same geometric analysis.</p>
+<p>VALIS queried Dash0 for checkout spans and found an anomalous trace:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>PlaceOrder (165,084ms)              ← 2.75 MINUTES
+</span></span><span style="display:flex;"><span>├─ prepareOrderItems (49ms)         ← Fast (batch fix working)
+</span></span><span style="display:flex;"><span>├─ ChargePayment (3ms)              ← Fast
+</span></span><span style="display:flex;"><span>├─ SendConfirmation (7ms)           ← Fast
+</span></span><span style="display:flex;"><span>├─ EmptyCart (2ms)                   ← Fast
+</span></span><span style="display:flex;"><span>└─ sendToPostProcessor (165,000ms)  ← BLOCKING KAFKA WRITE
+</span></span><span style="display:flex;"><span>   └─ orders publish (142,732ms)
+</span></span><span style="display:flex;"><span>      └─ Kafka ack wait...
+</span></span></code></pre></div><p>The structural properties:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Property</th>
+          <th>Value</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Fan-out from parent</td>
+          <td>N children, one dominant</td>
+      </tr>
+      <tr>
+          <td>Child homogeneity</td>
+          <td>Heterogeneous — different operations</td>
+      </tr>
+      <tr>
+          <td>Temporal pattern</td>
+          <td>Sequential, with one extreme outlier</td>
+      </tr>
+      <tr>
+          <td>Duration distribution</td>
+          <td>Bimodal: fast cluster + extreme tail</td>
+      </tr>
+      <tr>
+          <td>Protocol</td>
+          <td>Kafka (async messaging used synchronously)</td>
+      </tr>
+      <tr>
+          <td>Language</td>
+          <td>Go</td>
+      </tr>
+      <tr>
+          <td>Data layer</td>
+          <td>Message broker</td>
+      </tr>
+  </tbody>
+</table>
+<p>This is a different anti-pattern — <em>synchronous blocking on an asynchronous operation</em> — but the detection method was identical: analyze the trace tree&rsquo;s structural properties, classify the geometry, identify the pathology.</p>
+<p>The source code confirmed it. In <code>sendToPostProcessor</code>, the checkout service was blocking on a Kafka acknowledgment <code>select</code> statement, turning a fire-and-forget operation into a synchronous call that could block for minutes. Meanwhile, the payment was charged, the confirmation email was sent, and the user saw a 504 timeout believing their order failed.</p>
+<p>The fix: async fire-and-forget with background acknowledgment handling. Post-deployment: 4,700x latency improvement, from 165 seconds to 35 milliseconds. Zero human intervention. PR #3 on the same repository.</p>
+<h2 id="the-geometry-is-the-invariant">The Geometry Is the Invariant<a hidden class="anchor" aria-hidden="true" href="#the-geometry-is-the-invariant">#</a></h2>
+<p>Now look at what&rsquo;s the same across both cases and what&rsquo;s different:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Dimension</th>
+          <th>Case 1: N+1 gRPC</th>
+          <th>Case 2: Kafka Block</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Language</td>
+          <td>Go</td>
+          <td>Go</td>
+      </tr>
+      <tr>
+          <td>Protocol</td>
+          <td>gRPC</td>
+          <td>Kafka</td>
+      </tr>
+      <tr>
+          <td>Anti-pattern</td>
+          <td>N+1 Query</td>
+          <td>Sync-over-Async</td>
+      </tr>
+      <tr>
+          <td>Fan-out</td>
+          <td>2N+1 (linear scaling)</td>
+          <td>N (one dominant child)</td>
+      </tr>
+      <tr>
+          <td>Homogeneity</td>
+          <td>Repeating pairs</td>
+          <td>Heterogeneous</td>
+      </tr>
+      <tr>
+          <td>Temporality</td>
+          <td>Sequential, uniform</td>
+          <td>Sequential, one outlier</td>
+      </tr>
+      <tr>
+          <td>Duration dist.</td>
+          <td>Uniform, scaling</td>
+          <td>Bimodal, extreme tail</td>
+      </tr>
+      <tr>
+          <td>Detection method</td>
+          <td><strong>Trace topology analysis</strong></td>
+          <td><strong>Trace topology analysis</strong></td>
+      </tr>
+      <tr>
+          <td>Detection framework</td>
+          <td><strong>VALIS Bayesian engine</strong></td>
+          <td><strong>VALIS Bayesian engine</strong></td>
+      </tr>
+  </tbody>
+</table>
+<p>The anti-patterns are different. The geometries are different. But the <em>detection framework</em> is the same. It operates on structural properties of the trace tree — fan-out, homogeneity, temporality, duration distribution — and classifies the geometry against known signatures.</p>
+<p>The framework didn&rsquo;t need to know it was looking at gRPC calls in Case 1 and Kafka writes in Case 2. It didn&rsquo;t need to read Go source code. It didn&rsquo;t need to understand protocol buffers or Kafka producer semantics. It classified <em>shapes</em>, not implementations.</p>
+<p>This is the key insight: <strong>anti-patterns have geometric signatures that are independent of implementation details.</strong></p>
+<h2 id="beyond-n1-a-taxonomy-of-trace-geometries">Beyond N+1: A Taxonomy of Trace Geometries<a hidden class="anchor" aria-hidden="true" href="#beyond-n1-a-taxonomy-of-trace-geometries">#</a></h2>
+<p>If anti-patterns have characteristic geometries, then we can define a taxonomy — a classification system based on structural properties of trace trees.</p>
+<p>Here are the signatures I&rsquo;ve identified, expressed as regions in trace topology space:</p>
+<p><strong>N+1 Query / Chatty API</strong></p>
+<ul>
+<li>Fan-out: Linear with input cardinality</li>
+<li>Homogeneity: High (repeating operation type)</li>
+<li>Temporality: Sequential</li>
+<li>Signature: &ldquo;Comb&rdquo; — many identical teeth hanging from one spine</li>
+</ul>
+<p><strong>Sync-over-Async</strong></p>
+<ul>
+<li>Fan-out: Moderate, one dominant child</li>
+<li>Homogeneity: Low (mixed operation types)</li>
+<li>Duration distribution: Extreme bimodal</li>
+<li>Signature: &ldquo;Lollipop&rdquo; — small cluster of fast operations, one massively long stem</li>
+</ul>
+<p><strong>Retry Storm</strong></p>
+<ul>
+<li>Fan-out: Repeated calls to same target service</li>
+<li>Temporality: Sequential with increasing inter-span gaps</li>
+<li>Terminal state: Timeout or error</li>
+<li>Signature: &ldquo;Staircase&rdquo; — descending steps of increasing latency</li>
+</ul>
+<p><strong>Circuit Breaker Oscillation</strong></p>
+<ul>
+<li>Duration distribution: Periodic alternation between fast-fail and slow-fail</li>
+<li>Temporal pattern: Oscillating signal</li>
+<li>Signature: &ldquo;Sawtooth&rdquo; — repeating rise-and-crash pattern</li>
+</ul>
+<p><strong>Connection Pool Exhaustion</strong></p>
+<ul>
+<li>Duration distribution: Bimodal (immediate vs. wait-timeout)</li>
+<li>Degradation: Progressive — healthy cluster shrinks, waiting cluster grows</li>
+<li>Signature: &ldquo;Hourglass&rdquo; — flow constricts at a single resource bottleneck</li>
+</ul>
+<p>Each of these geometries is detectable through the same structural analysis framework. The Bayesian evidence streams differ — different properties matter for different patterns — but the <em>methodology</em> is invariant:</p>
+<ol>
+<li>Extract structural properties from trace topology</li>
+<li>Classify against known geometric signatures</li>
+<li>Calculate confidence via Bayesian inference</li>
+<li>Act on high-confidence detections</li>
+</ol>
+<h2 id="language-specific-anti-patterns-the-strongest-evidence">Language-Specific Anti-Patterns: The Strongest Evidence<a hidden class="anchor" aria-hidden="true" href="#language-specific-anti-patterns-the-strongest-evidence">#</a></h2>
+<p>There&rsquo;s an obvious objection to the universality claim: what about anti-patterns that only exist in specific runtimes? .NET&rsquo;s <code>SynchronizationContext</code> deadlocks. Java&rsquo;s classloader circular initialization. Python&rsquo;s GIL contention under asyncio. These are mechanisms unique to a single language. Surely they break the geometric framework?</p>
+<p>They don&rsquo;t. They strengthen it.</p>
+<p>Consider the .NET async deadlock — the classic case where a developer calls <code>.Result</code> or <code>.Wait()</code> on a <code>Task</code> inside a synchronization context, causing the continuation to wait for a thread that&rsquo;s blocked waiting for the continuation. This is a .NET-specific <em>mechanism</em>. Java doesn&rsquo;t have <code>SynchronizationContext</code>. Go doesn&rsquo;t have colored functions. The bug can only occur in .NET code.</p>
+<p>But what does it look like in the traces?</p>
+<p>A parent span starts. It invokes an async method, producing a child span. That child span either never completes or completes after an absurd duration — a timeout. Meanwhile, no other child spans appear, despite async methods being invoked. The trace tree shows a parent blocked on a single non-completing child with <em>zero concurrency despite async invocation</em>.</p>
+<p>That&rsquo;s a geometry. And it&rsquo;s the same geometry you&rsquo;d see from a Python <code>asyncio</code> deadlock caused by <code>loop.run_until_complete()</code> inside a running event loop, or a Kotlin coroutine deadlock from <code>runBlocking</code> inside a coroutine scope, or a Java <code>CompletableFuture.get()</code> blocking the fork-join pool. Different languages, different mechanisms, identical trace shape: parent blocked on non-completing async child, zero concurrent work, eventual timeout.</p>
+<p>The language-specific mechanism determines <em>why</em> the deadlock occurs. The geometry determines <em>that</em> it occurs — and the geometry is universal.</p>
+<p>This reveals a clean separation into three layers:</p>
+<p><strong>Layer 1: Geometry (universal).</strong> The structural properties of the trace tree — fan-out, temporal pattern, duration distribution, concurrency characteristics. This is where detection happens. Language-agnostic. Framework-agnostic. Vendor-agnostic.</p>
+<p><strong>Layer 2: Semantics (language-aware).</strong> The span attributes that explain the geometry — <code>code.function</code>, <code>thread.id</code>, <code>runtime.name</code>, <code>rpc.system</code>. OpenTelemetry semantic conventions give us this layer. When the geometric detector flags a &ldquo;deadlocked async&rdquo; shape, the semantic attributes narrow the diagnosis: &ldquo;this is a .NET service, the child span is <code>GetResultAsync</code>, the thread ID is the same for parent and child — probable <code>SynchronizationContext</code> capture.&rdquo;</p>
+<p><strong>Layer 3: Remediation (implementation-specific).</strong> The actual code fix. In .NET: replace <code>.Result</code> with <code>await</code>, or use <code>ConfigureAwait(false)</code>. In Python: restructure to avoid nested event loops. In Java: avoid <code>get()</code> on the common fork-join pool. Each language has its own fix, but the fix is only needed because the geometry was detected — and the geometry was detected without knowing the language.</p>
+<p>This layering means the signature library becomes hierarchical:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Deadlocked Async (universal geometry)
+</span></span><span style="display:flex;"><span>├── .NET: SynchronizationContext capture (.Result / .Wait())
+</span></span><span style="display:flex;"><span>├── Java: CompletableFuture.get() on ForkJoinPool
+</span></span><span style="display:flex;"><span>├── Python: run_until_complete inside running loop
+</span></span><span style="display:flex;"><span>├── Kotlin: runBlocking inside coroutine scope
+</span></span><span style="display:flex;"><span>└── [unknown runtime]: geometry detected, no specific diagnosis
+</span></span></code></pre></div><p>That last entry is the most powerful. When the geometric detector encounters the &ldquo;deadlocked async&rdquo; shape in a language it has no specific refinement for — a new Rust service using tokio, an Erlang process with a receive deadlock, a Zig experiment — it can still <em>detect the problem</em> from the shape alone. It can say: &ldquo;this trace shows a blocked parent waiting on a non-completing async child with zero concurrency. Something is deadlocked. Here&rsquo;s the span. Here&rsquo;s the service. Investigate.&rdquo;</p>
+<p>That capability — detecting unknown-language anti-patterns from geometry alone — doesn&rsquo;t exist in any APM tool on the market. Every APM vendor maintains separate agents for .NET, Java, Python, Go, each with its own detection logic, its own pattern library, its own blind spots. The geometric approach replaces all of them with one classifier that operates on trace topology.</p>
+<p>And it extends to every language-specific pathology I&rsquo;ve examined:</p>
+<ul>
+<li><strong>Java classloader deadlocks</strong> produce a dependency cycle visible as two concurrent spans that both stall at the same timestamp — the same geometry as a database deadlock or distributed lock conflict.</li>
+<li><strong>.NET <code>ThreadPool</code> starvation</strong> produces progressively increasing queue times visible as growing gaps between parent span start and child span start — the same geometry as connection pool exhaustion.</li>
+<li><strong>Python GIL contention</strong> under async load produces serialized execution of nominally concurrent operations — the same geometry as a mutex bottleneck in any language.</li>
+<li><strong>Go goroutine leaks</strong> produce fan-out that increases over time without corresponding fan-in — the same geometry as a resource leak in any runtime.</li>
+</ul>
+<p>In every case, the language-specific mechanism is the <em>cause</em>. The trace geometry is the <em>symptom</em>. And symptoms have shapes that transcend their causes.</p>
+<p>Language-specific anti-patterns aren&rsquo;t exceptions to the geometric framework. They&rsquo;re the strongest evidence for it — because they prove that even mechanisms unique to a single runtime still produce universally recognizable trace shapes.</p>
+<h2 id="why-this-hasnt-been-said-before">Why This Hasn&rsquo;t Been Said Before<a hidden class="anchor" aria-hidden="true" href="#why-this-hasnt-been-said-before">#</a></h2>
+<p>The pieces of this observation exist independently in the literature:</p>
+<p><strong>Brendan Gregg&rsquo;s flame graphs</strong> proved that performance problems have visual signatures — you can <em>see</em> the pathology in the shape. But flame graphs are single-process. They don&rsquo;t capture distributed topology.</p>
+<p><strong>Charity Majors and the Honeycomb team</strong> proved that high-cardinality, high-dimensionality trace data enables novel debugging. But Honeycomb&rsquo;s interaction model is human-driven query exploration, not automated geometric classification.</p>
+<p><strong>The OpenTelemetry project</strong> standardized span semantics across languages and frameworks, making cross-platform structural analysis possible. But OTel focuses on data collection and export, not topological analysis.</p>
+<p><strong>The SEI at Carnegie Mellon</strong> defined architectural anti-patterns in graph-theoretic terms. But they work at the static dependency level, not runtime trace topology.</p>
+<p>Nobody connected these pieces because, until recently, there was no <em>agent</em> that could operate on trace geometry programmatically. Humans could see shapes in flame graphs. Monitoring tools could apply threshold rules. But nothing could ingest a trace tree, measure its topological properties, run probabilistic classification, and <em>act</em> on the result.</p>
+<p>The theoretical framework wasn&rsquo;t useful without an execution engine. So nobody formalized it.</p>
+<p>I built the execution engine first. The theory followed.</p>
+<h2 id="the-execution-engine-valis">The Execution Engine: VALIS<a hidden class="anchor" aria-hidden="true" href="#the-execution-engine-valis">#</a></h2>
+<p>VALIS (Vast Active Living Intelligence System) is an autonomous observability platform built on an LLM-based reasoning agent. VALIS orchestrates across observability platforms, infrastructure management, source code repositories, and deployment pipelines through MCP (Model Context Protocol) servers, with a probabilistic classification engine providing Bayesian inference over trace topology features.</p>
+<p>The MCP architecture is what makes geometric detection possible. Each MCP server exposes a specific capability as a tool the reasoning agent can invoke. The agent orchestrates across tools — querying telemetry, analyzing topology with the classification engine, correlating to source code, deploying fixes, and verifying improvements.</p>
+<p>No single tool detects anti-patterns. The detection is an <strong>emergent property</strong> of connected tools orchestrated by a reasoning agent. Observability platforms provide perception. The classification engine provides probabilistic inference. Source repositories provide code correlation. Deployment systems provide remediation. The reasoning agent provides the coordination that connects them.</p>
+<p>This emergence is why the framework generalizes across anti-pattern types. The agent doesn&rsquo;t follow a script that says &ldquo;count GetProduct calls.&rdquo; It reasons: &ldquo;this trace tree has high fan-out, homogeneous children, sequential execution, and linear scaling. That geometric signature matches the N+1 pattern with high Bayesian confidence.&rdquo;</p>
+<p>Change the children from GetProduct to SQL queries to HTTP calls to Kafka writes — the geometry doesn&rsquo;t change. The confidence doesn&rsquo;t change. The detection doesn&rsquo;t change.</p>
+<h2 id="the-entropy-connection">The Entropy Connection<a hidden class="anchor" aria-hidden="true" href="#the-entropy-connection">#</a></h2>
+<p>There&rsquo;s a deeper principle underneath the geometry.</p>
+<p>An anti-pattern, in thermodynamic terms, is a code path that passes through <em>unnecessarily many states</em> to achieve an outcome reachable through fewer states. The N+1 pattern makes 2N+2 RPC calls when 3 would suffice. Each call adds network round trips, connection states, failure modes, timing interleavings. The <em>configuration space</em> of possible system states during execution is vastly larger than necessary.</p>
+<p>The batch fix collapses that configuration space. Fewer calls, fewer states, fewer ways for things to go wrong. The trace tree shrinks. The geometry simplifies.</p>
+<p>Anti-pattern detection through trace geometry is, at its core, <strong>entropy measurement</strong>. High fan-out with sequential homogeneous children is high entropy — many redundant microstates. The geometric signature <em>is</em> the entropy signature.</p>
+<p>Fixing the anti-pattern reduces local entropy. The system&rsquo;s behavior becomes more predictable. The trace tree occupies a smaller, tighter region of topology space.</p>
+<p>VALIS is, in effect, a Maxwell&rsquo;s Demon for distributed systems — observing microstates (spans), acquiring information (Bayesian inference), and acting to reduce local entropy (code fixes), all while exporting the entropic cost into computation and token consumption.</p>
+<h2 id="implications">Implications<a hidden class="anchor" aria-hidden="true" href="#implications">#</a></h2>
+<p>If anti-patterns have language-agnostic geometric signatures, several things follow:</p>
+<p><strong>Detection scales across polyglot architectures.</strong> The OpenTelemetry Astronomy Shop has services in Go, Python, JavaScript, Java, Ruby, C++, Rust, PHP, .NET, Erlang, and Kotlin. A geometric detector doesn&rsquo;t care. Spans are spans. Trees are trees. Shapes are shapes.</p>
+<p><strong>Detection is vendor-agnostic.</strong> I proved the N+1 detection on Dash0 with OTLP data. The same framework works on any backend that exposes trace data through a queryable interface — Honeycomb, Jaeger, Tempo, Datadog, Dynatrace. The geometry exists in the trace, not in the platform.</p>
+<p><strong>Language-specific anti-patterns become detectable without language-specific agents.</strong> A .NET <code>SynchronizationContext</code> deadlock produces the same trace geometry as a Python asyncio deadlock. The geometric classifier finds both. Language-specific refinements improve the diagnosis, but the detection itself is universal. This eliminates the need for per-language APM agents with separate detection logic — one geometric classifier replaces them all.</p>
+<p><strong>New anti-patterns can be discovered empirically.</strong> If you can measure trace topology, you can cluster traces by geometric similarity and discover anti-pattern signatures you didn&rsquo;t know to look for. The taxonomy doesn&rsquo;t need to be predefined. It can be <em>learned from production traffic</em>.</p>
+<p><strong>The human role shifts from pattern-matching to architecture.</strong> If an agent can detect geometric signatures and implement fixes autonomously, engineers stop being debuggers and become architects of the systems that enable autonomous detection. The leverage changes by orders of magnitude.</p>
+<h2 id="what-this-means-for-observability">What This Means for Observability<a hidden class="anchor" aria-hidden="true" href="#what-this-means-for-observability">#</a></h2>
+<p>The observability industry has spent a decade arguing about three pillars versus events versus traces versus metrics. The geometric perspective dissolves most of that debate.</p>
+<p>What matters is the <em>topology</em>. If your telemetry preserves parent-child relationships, timing, service attribution, and operation names — if it preserves the <em>shape</em> of execution — then geometric analysis can extract anti-pattern signatures regardless of how you label the data.</p>
+<p>Traces preserve topology. Metrics don&rsquo;t. Logs don&rsquo;t (unless correlated). This is why Charity Majors has been right about traces for years, but for a reason she may not have fully articulated: traces are the only telemetry type that preserves the geometric structure of distributed execution.</p>
+<p>And geometric structure is where the anti-patterns live.</p>
+<h2 id="conclusion">Conclusion<a hidden class="anchor" aria-hidden="true" href="#conclusion">#</a></h2>
+<p>I&rsquo;ve demonstrated, with two empirical case studies on production systems, that anti-patterns in distributed systems produce characteristic geometric signatures in trace topology space. These signatures are invariant across programming languages, communication protocols, and observability platforms. Even anti-patterns rooted in language-specific runtime mechanisms — .NET synchronization context deadlocks, Java classloader cycles, Python GIL contention — produce trace geometries that are universally recognizable, because the symptom has a shape that transcends its cause.</p>
+<p>The N+1 pattern in Go gRPC calls looks the same as an N+1 pattern in any other language and protocol. The sync-over-async pattern in Kafka has a distinct but equally recognizable geometry. Both were detected by the same framework operating on structural properties of trace trees — fan-out, homogeneity, temporality, duration distribution — without knowledge of the underlying implementation.</p>
+<p>This isn&rsquo;t monitoring. This isn&rsquo;t dashboarding. This isn&rsquo;t even observability in the traditional sense.</p>
+<p>This is <strong>computational geometry applied to distributed system behavior</strong>.</p>
+<p>The traces are the substrate. The shapes are the signal. The agent is the classifier.</p>
+<p>And the shapes are universal.</p>
+<hr>
+<p><em>Aaron Jacobs is a Principal Technical Consultant specializing in observability and AI. He is the creator of VALIS (Vast Active Living Intelligence System), an autonomous observability platform. His previous posts on closed-loop observability are available at <a href="https://o11y-alchemy.com">o11y-alchemy.com</a>. The detection framework, fixes, and deployment history are publicly available at <a href="https://github.com/npcomplete777/opentelemetry-demo">github.com/npcomplete777/opentelemetry-demo</a>.</em></p>
+<p><em>The code commits are the proof. The geometry is the insight. The question isn&rsquo;t whether this is possible — it&rsquo;s who will formalize it next.</em></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://npcomplete777.github.io/o11y-alchemy/tags/distributed-tracing/">Distributed-Tracing</a></li>
+      <li><a href="https://npcomplete777.github.io/o11y-alchemy/tags/anti-patterns/">Anti-Patterns</a></li>
+      <li><a href="https://npcomplete777.github.io/o11y-alchemy/tags/trace-topology/">Trace-Topology</a></li>
+      <li><a href="https://npcomplete777.github.io/o11y-alchemy/tags/opentelemetry/">Opentelemetry</a></li>
+      <li><a href="https://npcomplete777.github.io/o11y-alchemy/tags/valis/">VALIS</a></li>
+      <li><a href="https://npcomplete777.github.io/o11y-alchemy/tags/geometric-detection/">Geometric-Detection</a></li>
+      <li><a href="https://npcomplete777.github.io/o11y-alchemy/tags/observability/">Observability</a></li>
+      <li><a href="https://npcomplete777.github.io/o11y-alchemy/tags/autonomous-remediation/">Autonomous-Remediation</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://npcomplete777.github.io/o11y-alchemy/posts/autonomous-remediation-silent-checkout/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>From 504 Timeout to 35ms: Autonomous Remediation of Silent Checkout Failures</span>
+  </a>
+  <a class="next" href="https://npcomplete777.github.io/o11y-alchemy/posts/open-architecture-autonomous-remediation/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Why Autonomous Remediation Requires Open Architecture</span>
+  </a>
+</nav>
+
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology on x"
+            href="https://x.com/intent/tweet/?text=The%20Geometry%20of%20Failure%3a%20Language-Agnostic%20Anti-Pattern%20Signatures%20in%20Distributed%20Trace%20Topology&amp;url=https%3a%2f%2fnpcomplete777.github.io%2fo11y-alchemy%2fposts%2fgeometry-of-failure%2f&amp;hashtags=distributed-tracing%2canti-patterns%2ctrace-topology%2cOpenTelemetry%2cVALIS%2cgeometric-detection%2cobservability%2cautonomous-remediation">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fnpcomplete777.github.io%2fo11y-alchemy%2fposts%2fgeometry-of-failure%2f&amp;title=The%20Geometry%20of%20Failure%3a%20Language-Agnostic%20Anti-Pattern%20Signatures%20in%20Distributed%20Trace%20Topology&amp;summary=The%20Geometry%20of%20Failure%3a%20Language-Agnostic%20Anti-Pattern%20Signatures%20in%20Distributed%20Trace%20Topology&amp;source=https%3a%2f%2fnpcomplete777.github.io%2fo11y-alchemy%2fposts%2fgeometry-of-failure%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology on reddit"
+            href="https://reddit.com/submit?url=https%3a%2f%2fnpcomplete777.github.io%2fo11y-alchemy%2fposts%2fgeometry-of-failure%2f&title=The%20Geometry%20of%20Failure%3a%20Language-Agnostic%20Anti-Pattern%20Signatures%20in%20Distributed%20Trace%20Topology">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology on facebook"
+            href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2fnpcomplete777.github.io%2fo11y-alchemy%2fposts%2fgeometry-of-failure%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology on whatsapp"
+            href="https://api.whatsapp.com/send?text=The%20Geometry%20of%20Failure%3a%20Language-Agnostic%20Anti-Pattern%20Signatures%20in%20Distributed%20Trace%20Topology%20-%20https%3a%2f%2fnpcomplete777.github.io%2fo11y-alchemy%2fposts%2fgeometry-of-failure%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology on telegram"
+            href="https://telegram.me/share/url?text=The%20Geometry%20of%20Failure%3a%20Language-Agnostic%20Anti-Pattern%20Signatures%20in%20Distributed%20Trace%20Topology&amp;url=https%3a%2f%2fnpcomplete777.github.io%2fo11y-alchemy%2fposts%2fgeometry-of-failure%2f">
+            <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology on ycombinator"
+            href="https://news.ycombinator.com/submitlink?t=The%20Geometry%20of%20Failure%3a%20Language-Agnostic%20Anti-Pattern%20Signatures%20in%20Distributed%20Trace%20Topology&u=https%3a%2f%2fnpcomplete777.github.io%2fo11y-alchemy%2fposts%2fgeometry-of-failure%2f">
+            <svg version="1.1" xml:space="preserve" width="30px" height="30px" viewBox="0 0 512 512" fill="currentColor"
+                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+                <path
+                    d="M449.446 0C483.971 0 512 28.03 512 62.554L512 449.446C512 483.97 483.97 512 449.446 512L62.554 512C28.03 512 0 483.97 0 449.446L0 62.554C0 28.03 28.029 0 62.554 0L449.446 0ZM183.8767 87.9921H121.8427L230.6673 292.4508V424.0079H281.3328V292.4508L390.1575 87.9921H328.1233L256 238.2489z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://npcomplete777.github.io/o11y-alchemy/">O11y Alchemy</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

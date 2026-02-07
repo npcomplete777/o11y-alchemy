@@ -16,6 +16,13 @@
       <description>A demonstration of fully autonomous code remediation: VALIS detected a critical silent checkout failure pattern, generated an async Kafka fix, deployed via GitOps, and validated a 4,700x latency improvement—all without human intervention.</description>
     </item>
     <item>
+      <title>The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology</title>
+      <link>https://npcomplete777.github.io/o11y-alchemy/posts/geometry-of-failure/</link>
+      <pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate>
+      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/geometry-of-failure/</guid>
+      <description>Anti-patterns in distributed systems have geometric shapes that are invariant across languages, frameworks, and protocols. Empirical evidence from two production systems demonstrates how trace topology analysis enables language-agnostic anti-pattern detection.</description>
+    </item>
+    <item>
       <title>Why Autonomous Remediation Requires Open Architecture</title>
       <link>https://npcomplete777.github.io/o11y-alchemy/posts/open-architecture-autonomous-remediation/</link>
       <pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate>

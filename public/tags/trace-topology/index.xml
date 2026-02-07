@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Trace-Topology on O11y Alchemy</title>
+    <link>https://npcomplete777.github.io/o11y-alchemy/tags/trace-topology/</link>
+    <description>Recent content in Trace-Topology on O11y Alchemy</description>
+    <generator>Hugo -- 0.155.2</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 04 Feb 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://npcomplete777.github.io/o11y-alchemy/tags/trace-topology/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology</title>
+      <link>https://npcomplete777.github.io/o11y-alchemy/posts/geometry-of-failure/</link>
+      <pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate>
+      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/geometry-of-failure/</guid>
+      <description>Anti-patterns in distributed systems have geometric shapes that are invariant across languages, frameworks, and protocols. Empirical evidence from two production systems demonstrates how trace topology analysis enables language-agnostic anti-pattern detection.</description>
+    </item>
+  </channel>
+</rss>
