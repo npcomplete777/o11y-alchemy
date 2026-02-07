@@ -242,19 +242,13 @@ I built the execution engine first. The theory followed.
 
 ## The Execution Engine: VALIS
 
-VALIS (Vast Active Living Intelligence System) is an autonomous observability platform built on Claude with MCP servers providing access to:
+VALIS (Vast Active Living Intelligence System) is an autonomous observability platform built on an LLM-based reasoning agent. VALIS orchestrates across observability platforms, infrastructure management, source code repositories, and deployment pipelines through MCP (Model Context Protocol) servers, with a probabilistic classification engine providing Bayesian inference over trace topology features.
 
-- **Dash0**: Span querying, log analysis, alerting, sampling rules
-- **kubectl**: Kubernetes cluster state
-- **GitHub**: Source code access, branch creation, PR workflow
-- **ArgoCD**: GitOps deployment and verification
-- **VALIS statistical engine**: Bayesian inference, temporal analysis, anomaly detection, Granger causality, Monte Carlo simulation
+The MCP architecture is what makes geometric detection possible. Each MCP server exposes a specific capability as a tool the reasoning agent can invoke. The agent orchestrates across tools — querying telemetry, analyzing topology with the classification engine, correlating to source code, deploying fixes, and verifying improvements.
 
-The MCP (Model Context Protocol) architecture is what makes geometric detection possible. Each MCP server exposes a specific capability as a tool the AI agent can invoke. The agent orchestrates across tools — querying telemetry from Dash0, analyzing topology with the statistical engine, correlating to source code via GitHub, deploying fixes through ArgoCD, and verifying improvements by querying Dash0 again.
+No single tool detects anti-patterns. The detection is an **emergent property** of connected tools orchestrated by a reasoning agent. Observability platforms provide perception. The classification engine provides probabilistic inference. Source repositories provide code correlation. Deployment systems provide remediation. The reasoning agent provides the coordination that connects them.
 
-No single tool detects anti-patterns. The detection is an **emergent property** of connected tools orchestrated by a reasoning agent. Dash0 provides perception. The statistical engine provides classification. GitHub provides code correlation. ArgoCD provides remediation. Claude provides the reasoning that connects them.
-
-This emergence is why the framework generalizes across anti-pattern types. The agent doesn't follow a script that says "count GetProduct calls." It reasons: "this trace tree has high fan-out, homogeneous children, sequential execution, and linear scaling. That geometric signature matches the N+1 pattern with 99.2% Bayesian confidence."
+This emergence is why the framework generalizes across anti-pattern types. The agent doesn't follow a script that says "count GetProduct calls." It reasons: "this trace tree has high fan-out, homogeneous children, sequential execution, and linear scaling. That geometric signature matches the N+1 pattern with high Bayesian confidence."
 
 Change the children from GetProduct to SQL queries to HTTP calls to Kafka writes — the geometry doesn't change. The confidence doesn't change. The detection doesn't change.
 
