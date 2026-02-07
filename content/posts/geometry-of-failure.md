@@ -42,7 +42,7 @@ An N+1 query in Go producing gRPC spans occupies the same region of trace topolo
 
 The first detection occurred in the checkout service of the OpenTelemetry Astronomy Shop, a polyglot microservices application running on k3s and exporting OTLP telemetry to Dash0.
 
-VALIS — my autonomous observability system built on Claude with MCP-integrated tooling — queried Dash0 for recent spans from the checkout service and found this structure:
+VALIS — my autonomous observability system — queried the observability platform for recent spans from the checkout service and found this structure:
 
 ```
 PlaceOrder (297ms)
@@ -78,7 +78,7 @@ The full detection-to-verification cycle — perceive, reason, act, verify — w
 
 The second detection was structurally different but revealed through the same geometric analysis.
 
-VALIS queried Dash0 for checkout spans and found an anomalous trace:
+VALIS queried the observability platform for checkout spans and found an anomalous trace:
 
 ```
 PlaceOrder (165,084ms)              ← 2.75 MINUTES

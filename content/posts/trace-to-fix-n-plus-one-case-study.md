@@ -12,7 +12,7 @@ description: "A case study in closed-loop observability: using distributed trace
 
 Modern observability platforms generate vast amounts of telemetry data—traces, metrics, and logs—that often go underutilized beyond basic dashboarding and alerting. This case study demonstrates a complete autonomous workflow for extracting actionable intelligence from distributed traces: detecting a performance anti-pattern, implementing a fix, deploying it through GitOps, and validating the improvement—all orchestrated through an AI agent integrated with observability and infrastructure tooling via the Model Context Protocol (MCP).
 
-The target application is the OpenTelemetry Astronomy Shop, a reference microservices application running on k3s (via OrbStack) and exporting OTLP telemetry to Dash0. The entire workflow was executed autonomously using Claude as an AI agent with MCP servers providing access to Dash0 (observability), kubectl (Kubernetes), GitHub (source control), and ArgoCD (GitOps deployment).
+The target application is the OpenTelemetry Astronomy Shop, a reference microservices application running on k3s (via OrbStack) and exporting OTLP telemetry to Dash0. The entire workflow was executed autonomously using an AI reasoning agent with MCP servers providing access to observability platforms, Kubernetes infrastructure, source control, and GitOps deployment.
 
 **Watch the detection and analysis phase**: [Closed-Loop Observability Demo](https://youtu.be/CweT2VthiKo?si=8e_7OUMEwRAJfsNM)
 
@@ -42,13 +42,7 @@ The Model Context Protocol provides standardized tool interfaces (like LSP did f
 
 ### Automated Span Querying
 
-The investigation began with an autonomous query to the Dash0 MCP server, requesting recent spans from the checkout service:
-
-```
-dash0_spans_query(service_name="checkout", time_range_minutes=30, limit=100)
-```
-
-The returned spans revealed a concerning pattern in the `prepareOrderItemsAndShippingQuoteFromCart` function. For each item in a shopping cart, the checkout service was making sequential RPC calls:
+The investigation began with an autonomous query to the observability platform, requesting recent spans from the checkout service. The returned spans revealed a concerning pattern in the `prepareOrderItemsAndShippingQuoteFromCart` function. For each item in a shopping cart, the checkout service was making sequential RPC calls:
 
 | Span Name | Duration | Pattern |
 |-----------|----------|---------|
@@ -78,7 +72,7 @@ The autonomous analysis generated a structured anti-pattern report matching the 
 
 ### Correlating Traces to Source Code
 
-Using the GitHub MCP server, the agent retrieved the source code for the checkout service. The problematic function was immediately apparent in `src/checkout/main.go`:
+Using source code correlation, the agent retrieved the checkout service implementation. The problematic function was immediately apparent in `src/checkout/main.go`:
 
 ```go
 func (cs *checkout) prepOrderItems(ctx context.Context,
@@ -157,31 +151,13 @@ The implementation can be viewed in the [GitHub commit history](https://github.c
 
 ### Deploying Through GitOps
 
-With the code changes committed to GitHub, ArgoCD automatically detected the new commit and began synchronization. Using the ArgoCD MCP server, the deployment was monitored:
-
-```
-argo_app_sync(name="otel-demo")
-argo_app_wait(name="otel-demo", health=true, sync=true)
-```
-
-The kubectl MCP server confirmed the new pods were running:
-
-```
-k8s_get(resource="pods", namespace="otel-demo",
-        selector="app.kubernetes.io/component in (checkout,product-catalog,currency)")
-```
+With the code changes committed to GitHub, ArgoCD automatically detected the new commit and began synchronization. The deployment was monitored until all applications reached a healthy and synced state. The Kubernetes cluster confirmed the new pods were running with the updated code.
 
 ## 3. Validation and an Unexpected Discovery
 
 ### Initial Validation: Pattern Fix Confirmed
 
-After deployment, the agent queried Dash0 again to verify the batch pattern was active:
-
-```
-dash0_spans_query(service_name="checkout", time_range_minutes=15)
-```
-
-The traces now showed the expected batch pattern:
+After deployment, the agent queried the observability platform again to verify the batch pattern was active. The traces now showed the expected batch pattern:
 
 ```
 prepOrderItems (979.56ms)
@@ -207,18 +183,7 @@ What initially appeared to be a "Kafka latency bottleneck" (the `orders publish`
 
 ### Fixing the Resource Allocation
 
-Using kubectl, the agent patched the deployment to provide adequate resources:
-
-```
-k8s_patch(resource="deployment", name="checkout", namespace="otel-demo",
-  patch={"spec":{"template":{"spec":{"containers":[{
-    "name":"checkout",
-    "resources":{"limits":{"memory":"200Mi"},"requests":{"memory":"100Mi"}},
-    "env":[{"name":"GOMEMLIMIT","value":"180MiB"}]
-  }]}}}})
-```
-
-Similar patches were applied to the currency and shipping services, which also had 20Mi limits.
+The agent patched the deployment to provide adequate resources: increasing memory limits from 20Mi to 200Mi and setting the Go runtime's `GOMEMLIMIT` environment variable to 180MiB to allow the garbage collector to operate efficiently within bounds. Similar patches were applied to the currency and shipping services, which also had inadequate 20Mi limits.
 
 ## Results: Before and After
 
@@ -265,7 +230,7 @@ The "Kafka latency bottleneck" was actually OOMKilled restarts. The N+1 pattern 
 
 ### 3. MCP Enables Closed-Loop Observability
 
-The Model Context Protocol allowed seamless integration of observability (Dash0), infrastructure (kubectl), source control (GitHub), and deployment (ArgoCD) into a single autonomous workflow. The AI agent could perceive the system state, reason about anti-patterns, and take corrective action—closing the observability loop.
+The Model Context Protocol allowed seamless integration of observability platforms, infrastructure management, source control, and deployment systems into a single autonomous workflow. The AI agent could perceive the system state, reason about anti-patterns, and take corrective action—closing the observability loop.
 
 ### 4. Resource Limits Matter
 
@@ -275,9 +240,9 @@ A 20Mi memory limit for a Go service with Kafka and OTel instrumentation is a co
 
 What made this workflow possible wasn't just AI capability—it was the architecture of perception and action. The system required:
 
-**Perception Layer**: MCP servers exposing observability data, infrastructure state, and code repositories as queryable interfaces. Without standardized APIs, the agent would be blind.
+**Perception Layer**: Standardized interfaces exposing observability data, infrastructure state, and code repositories as queryable data. Without programmatic access, the agent would be blind.
 
-**Analysis Layer**: Pattern recognition trained on known anti-patterns (N+1 queries, chatty APIs, retry storms), combined with statistical methods for anomaly detection and correlation.
+**Analysis Layer**: Pattern recognition trained on known anti-patterns (N+1 queries, chatty APIs, retry storms), combined with probabilistic methods for anomaly detection and correlation.
 
 **Action Layer**: Write access to infrastructure systems—the ability to commit code, trigger deployments, modify resource allocations. Observation without action is surveillance, not remediation.
 

@@ -20,16 +20,16 @@ The truth was worse than it appeared: **orders were actually succeeding**. Payme
 
 ### Telemetry Evidence
 
-VALIS detected this pattern through trace analysis with **99.98% confidence** using Bayesian inference:
+VALIS detected this pattern through trace analysis using Bayesian inference:
 
-| Evidence | Prior | Posterior | Confidence Gain |
-|----------|-------|-----------|-----------------| 
-| Request completes but client times out | 5.0% | 34.2% | +29.2% |
-| Blocking I/O in request path | 34.2% | 78.6% | +44.4% |
-| Kafka write exceeds proxy timeout | 78.6% | 96.8% | +18.2% |
-| Successful downstream but 504 upstream | 96.8% | 99.98% | +3.18% |
+| Evidence | Confidence Level |
+|----------|------------------|
+| Request completes but client times out | Low → Moderate |
+| Blocking I/O in request path | Moderate → High |
+| Kafka write exceeds proxy timeout | High → Very High |
+| Successful downstream but 504 upstream | Very High → Near-certain |
 
-**Likelihood Ratio: 4,999:1** — The evidence is 4,999 times more likely if this silent failure pattern exists than if it doesn't.
+The evidence strongly supported the silent failure pattern hypothesis.
 
 The trace that revealed the problem:
 
@@ -104,21 +104,21 @@ The key insight: **Kafka acknowledgment doesn't need to block the request path**
 
 The entire remediation was executed without human intervention:
 
-| Step | Tool | Result |
-|------|------|--------|
-| 1. Detect pattern | `dash0_spans_query` | Found 142s blocking Kafka write |
-| 2. Correlate to code | `valis_trace_to_code` | Identified `sendToPostProcessor` at line 611 |
-| 3. Grep for context | `valis_local_grep` | Found blocking `select` pattern |
-| 4. Read current code | `valis_local_read` | Retrieved full function implementation |
-| 5. Create branch | `valis_git_branch` | `valis/fix/async-kafka-checkout` |
-| 6. Apply fix | `valis_local_write` | +49/-29 lines changed |
-| 7. Build verification | `bash: go build` | Compilation successful |
-| 8. Commit | `valis_git_commit` | `d6b465d6dddd44289a52fa8522630e73e00f48c3` |
-| 9. Push | `valis_git_push` | Branch pushed to origin |
-| 10. Create PR | `github_pr_create` | [PR #3](https://github.com/npcomplete777/opentelemetry-demo/pull/3) |
-| 11. Merge | `github_pr_merge` | Squash merged to main |
-| 12. Deploy | ArgoCD auto-sync | Pods rolled out |
-| 13. Validate | `dash0_spans_query` | Confirmed improvement |
+| Step | Action | Result |
+|------|--------|--------|
+| 1. Detect pattern | Query observability platform | Found 142s blocking Kafka write |
+| 2. Correlate to code | Trace to source code correlation | Identified `sendToPostProcessor` at line 611 |
+| 3. Analyze context | Search codebase for pattern | Found blocking `select` pattern |
+| 4. Read current code | Retrieve function implementation | Full code context acquired |
+| 5. Create branch | Create feature branch | `valis/fix/async-kafka-checkout` |
+| 6. Apply fix | Generate and apply code changes | +49/-29 lines changed |
+| 7. Build verification | Verify compilation | Build successful |
+| 8. Commit | Commit changes with attribution | `d6b465d6dddd44289a52fa8522630e73e00f48c3` |
+| 9. Push | Push to remote repository | Branch pushed to origin |
+| 10. Create PR | Create pull request | [PR #3](https://github.com/npcomplete777/opentelemetry-demo/pull/3) |
+| 11. Merge | Merge to main branch | Squash merged to main |
+| 12. Deploy | GitOps deployment sync | Pods rolled out |
+| 13. Validate | Query observability platform | Confirmed improvement |
 
 **Total human intervention: Zero**
 
@@ -148,7 +148,6 @@ Solution: Fire-and-forget pattern with background goroutine for
 success/error handling. Request returns immediately after queue submission.
 
 Detected-By: VALIS autonomous observability
-Confidence: 99.98%
 Evidence: Trace B0kdCF2s8oNRxg7B9CNBmw== showed 142s Kafka block
 ```
 
@@ -181,13 +180,13 @@ What made this possible wasn't just AI capability—it was the architecture of p
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-**Perception Layer**: Dash0 MCP server exposes spans as queryable data. The agent can ask "show me slow checkouts" and receive structured telemetry.
+**Perception Layer**: The observability platform exposes spans as queryable data. The reasoning agent can ask "show me slow checkouts" and receive structured telemetry.
 
 **Reasoning Layer**: Bayesian inference over multiple evidence streams produces high-confidence pattern detection. This isn't pattern matching—it's probabilistic reasoning.
 
-**Action Layer**: Local git operations (clone, branch, edit, commit, push) enable code changes. GitHub MCP creates PRs. ArgoCD deploys automatically.
+**Action Layer**: Local git operations (clone, branch, edit, commit, push) enable code changes. Source control integration enables automated PRs. GitOps systems deploy automatically.
 
-**Verification Layer**: The loop closes when the agent queries Dash0 again and confirms the fix worked. Same tools, different question: "are checkouts still slow?"
+**Verification Layer**: The loop closes when the agent queries the observability platform again and confirms the fix worked. Same interface, different question: "are checkouts still slow?"
 
 ## What This Means
 
@@ -197,7 +196,7 @@ This demonstration proves several things:
 
 2. **Rich telemetry enables AI reasoning**. Without detailed traces showing the 142-second Kafka block, the pattern would be invisible. Observability quality determines AI capability.
 
-3. **MCP is the integration layer**. The Model Context Protocol allowed seamless connection between observability (Dash0), infrastructure (kubectl), source control (GitHub), and deployment (ArgoCD). Without standardized interfaces, this workflow would require custom integration code for each tool.
+3. **MCP is the integration layer**. The Model Context Protocol allowed seamless connection between observability platforms, infrastructure management, source control, and deployment systems. Without standardized interfaces, this workflow would require custom integration code for each tool.
 
 4. **The human role shifts from author to architect**. I (Aaron) built the system that enables autonomous remediation. I did not write the fix, trigger the deployment, or verify the results. My leverage increased by building systems that can complete entire OODA loops without me.
 
