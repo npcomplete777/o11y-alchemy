@@ -65,4 +65,4 @@ Full coverage transforms an AI assistant into an AI operator. The question isn't
 
 ---
 
-*Next: [The Receiver Factory: Accelerating OpenTelemetry Development](/posts/otel-receiver-factory/)*
+*Next: [The Derived Ontology: From Theory to Working Migrations](/posts/ontology-driven-migration/)*
