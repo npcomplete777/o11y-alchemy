@@ -1,19 +1,13 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
-  <channel>
-    <title>Migration on O11y Alchemy</title>
-    <link>https://npcomplete777.github.io/o11y-alchemy/tags/migration/</link>
-    <description>Recent content in Migration on O11y Alchemy</description>
-    <generator>Hugo -- 0.155.2</generator>
-    <language>en-us</language>
-    <lastBuildDate>Fri, 03 Jan 2025 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://npcomplete777.github.io/o11y-alchemy/tags/migration/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Ontologies for Vendor-Agnostic Observability Migration</title>
-      <link>https://npcomplete777.github.io/o11y-alchemy/posts/observability-ontologies/</link>
-      <pubDate>Fri, 03 Jan 2025 00:00:00 +0000</pubDate>
-      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/observability-ontologies/</guid>
-      <description>Building semantic bridges between observability platforms for intelligent configuration migration</description>
-    </item>
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Migration on O11y Alchemy</title><link>https://npcomplete777.github.io/o11y-alchemy/tags/migration/</link><description>Recent content in Migration on O11y Alchemy</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Thu, 20 Feb 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://npcomplete777.github.io/o11y-alchemy/tags/migration/index.xml" rel="self" type="application/rss+xml"/><item><title>The Derived Ontology: From Theory to Working Migrations</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/ontology-driven-migration/</link><pubDate>Thu, 20 Feb 2025 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/ontology-driven-migration/</guid><description>&lt;h2 id="from-concept-to-proof"&gt;From Concept to Proof&lt;/h2&gt;
+&lt;p&gt;In January I wrote about &lt;a href="https://npcomplete777.github.io/o11y-alchemy/posts/observability-ontologies/"&gt;ontologies for vendor-agnostic observability migration&lt;/a&gt;—the idea that a canonical semantic layer could bridge the conceptual gaps between platforms. That post was theory. This one is about what happened when we built it and pointed it at real infrastructure.&lt;/p&gt;
+&lt;p&gt;The short version: we now have autonomous, AI-driven migration of dashboards and alert rules across three observability stacks—ELK (Elasticsearch/Kibana), LGTM (Loki/Grafana/Tempo/Mimir), and Dash0—using derived ontological mappings that an AI agent traverses at runtime. Not scripts. Not templates. An agent that reads a source dashboard, understands what each panel &lt;em&gt;means&lt;/em&gt;, and rebuilds it idiomatically on the target platform.&lt;/p&gt;</description></item><item><title>Ontologies for Vendor-Agnostic Observability Migration</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/observability-ontologies/</link><pubDate>Fri, 03 Jan 2025 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/observability-ontologies/</guid><description>&lt;h2 id="the-migration-problem"&gt;The Migration Problem&lt;/h2&gt;
+&lt;p&gt;Observability platform migrations are notoriously painful. Whether you&amp;rsquo;re moving from Datadog to Dynatrace, New Relic to Grafana, or any other combination, the process typically involves:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Exporting dashboards and alerts as JSON&lt;/li&gt;
+&lt;li&gt;Manually mapping fields between schemas&lt;/li&gt;
+&lt;li&gt;Rewriting queries in the target platform&amp;rsquo;s language&lt;/li&gt;
+&lt;li&gt;Rebuilding what doesn&amp;rsquo;t translate&lt;/li&gt;
+&lt;li&gt;Hoping nothing breaks&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This is &lt;strong&gt;syntactic translation&lt;/strong&gt;—moving symbols between systems without understanding what they mean.&lt;/p&gt;
+&lt;p&gt;The result: migrations take months, cost more than expected, and leave gaps that only surface in production.&lt;/p&gt;</description></item></channel></rss>

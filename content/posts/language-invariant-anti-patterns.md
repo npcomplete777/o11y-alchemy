@@ -1,7 +1,7 @@
 ---
 title: "Anti-Patterns Have Shapes, and Shapes Don't Care What Language You Write In"
 date: 2026-02-07
-draft: false
+draft: true
 tags: ["distributed-tracing", "anti-patterns", "trace-topology", "language-invariance", "Go", "Python", "Java", "OpenTelemetry", "N+1", "geometric-detection", "Bayesian-inference"]
 categories: ["Research", "Experiments"]
 author: "Aaron Jacobs"

@@ -1,40 +1,19 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
-  <channel>
-    <title>Opentelemetry on O11y Alchemy</title>
-    <link>https://npcomplete777.github.io/o11y-alchemy/tags/opentelemetry/</link>
-    <description>Recent content in Opentelemetry on O11y Alchemy</description>
-    <generator>Hugo -- 0.155.2</generator>
-    <language>en-us</language>
-    <lastBuildDate>Wed, 04 Feb 2026 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://npcomplete777.github.io/o11y-alchemy/tags/opentelemetry/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>From 504 Timeout to 35ms: Autonomous Remediation of Silent Checkout Failures</title>
-      <link>https://npcomplete777.github.io/o11y-alchemy/posts/autonomous-remediation-silent-checkout/</link>
-      <pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate>
-      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/autonomous-remediation-silent-checkout/</guid>
-      <description>A demonstration of fully autonomous code remediation: VALIS detected a critical silent checkout failure pattern, generated an async Kafka fix, deployed via GitOps, and validated a 4,700x latency improvement—all without human intervention.</description>
-    </item>
-    <item>
-      <title>The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology</title>
-      <link>https://npcomplete777.github.io/o11y-alchemy/posts/geometry-of-failure/</link>
-      <pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate>
-      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/geometry-of-failure/</guid>
-      <description>Anti-patterns in distributed systems have geometric shapes that are invariant across languages, frameworks, and protocols. Empirical evidence from two production systems demonstrates how trace topology analysis enables language-agnostic anti-pattern detection.</description>
-    </item>
-    <item>
-      <title>Closed-Loop Observability: From Trace Detection to Autonomous Remediation</title>
-      <link>https://npcomplete777.github.io/o11y-alchemy/posts/trace-to-fix-n-plus-one-case-study/</link>
-      <pubDate>Sun, 01 Feb 2026 00:00:00 +0000</pubDate>
-      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/trace-to-fix-n-plus-one-case-study/</guid>
-      <description>A case study in closed-loop observability: using distributed traces, MCP-integrated tooling, and GitOps to autonomously identify, fix, deploy, and verify a performance anti-pattern in a microservices application—demonstrating the shift from passive monitoring to active remediation.</description>
-    </item>
-    <item>
-      <title>The Receiver Factory: Accelerating OpenTelemetry Development</title>
-      <link>https://npcomplete777.github.io/o11y-alchemy/posts/otel-receiver-factory/</link>
-      <pubDate>Fri, 03 Jan 2025 00:00:00 +0000</pubDate>
-      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/otel-receiver-factory/</guid>
-      <description>Generating production-ready OTel receivers from API specifications</description>
-    </item>
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>OpenTelemetry on O11y Alchemy</title><link>https://npcomplete777.github.io/o11y-alchemy/tags/opentelemetry/</link><description>Recent content in OpenTelemetry on O11y Alchemy</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Wed, 04 Feb 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://npcomplete777.github.io/o11y-alchemy/tags/opentelemetry/index.xml" rel="self" type="application/rss+xml"/><item><title>From 504 Timeout to 35ms: Autonomous Remediation of Silent Checkout Failures</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/autonomous-remediation-silent-checkout/</link><pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/autonomous-remediation-silent-checkout/</guid><description>&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;The measure of intelligence is the ability to change.&amp;rdquo; — Albert Einstein&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;This case study documents a fully autonomous code remediation cycle: from anti-pattern detection through code fix, deployment, and validated improvement. No human wrote the fix. No human triggered the deployment. No human verified the results. The entire workflow was executed by VALIS (Vast Active Living Intelligence System) through MCP-integrated tooling.&lt;/p&gt;
+&lt;h2 id="the-problem-silent-order-failures"&gt;The Problem: Silent Order Failures&lt;/h2&gt;
+&lt;p&gt;Users were experiencing a frustrating pattern: they&amp;rsquo;d click &amp;ldquo;Place Order,&amp;rdquo; see a loading spinner for 15+ seconds, then receive a 504 Gateway Timeout error. Believing their order failed, they&amp;rsquo;d retry—only to discover later they&amp;rsquo;d been charged twice.&lt;/p&gt;</description></item><item><title>The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/geometry-of-failure/</link><pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/geometry-of-failure/</guid><description>&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;The real cycle you&amp;rsquo;re working on is a cycle called yourself.&amp;rdquo; — Robert M. Pirsig, &lt;em&gt;Zen and the Art of Motorcycle Maintenance&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id="the-claim"&gt;The Claim&lt;/h2&gt;
+&lt;p&gt;I&amp;rsquo;m going to make a claim that I haven&amp;rsquo;t seen anyone else make explicitly, and then back it up with empirical evidence from three production experiments.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Anti-patterns in distributed systems produce characteristic geometric signatures in trace topology space. These signatures are invariant across programming languages, runtimes, and instrumentation strategies. A system that classifies trace geometry can detect anti-patterns without knowing anything about the underlying implementation.&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>Closed-Loop Observability: From Trace Detection to Autonomous Remediation</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/trace-to-fix-n-plus-one-case-study/</link><pubDate>Sun, 01 Feb 2026 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/trace-to-fix-n-plus-one-case-study/</guid><description>&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;The real cycle you&amp;rsquo;re working on is a cycle called yourself.&amp;rdquo; — Robert M. Pirsig, &lt;em&gt;Zen and the Art of Motorcycle Maintenance&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Modern observability platforms generate vast amounts of telemetry data—traces, metrics, and logs—that often go underutilized beyond basic dashboarding and alerting. This case study demonstrates a complete autonomous workflow for extracting actionable intelligence from distributed traces: detecting a performance anti-pattern, implementing a fix, deploying it through GitOps, and validating the improvement—all orchestrated through an AI agent integrated with observability and infrastructure tooling via the Model Context Protocol (MCP).&lt;/p&gt;</description></item><item><title>VALIS: Autonomous Anti-Pattern Detection for Production Observability</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/valis-autonomous-anti-pattern-detection/</link><pubDate>Sun, 01 Feb 2026 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/valis-autonomous-anti-pattern-detection/</guid><description>&lt;h2 id="the-problem-with-passive-observability"&gt;The Problem with Passive Observability&lt;/h2&gt;
+&lt;p&gt;Most observability workflows are fundamentally reactive. We instrument our services, ship telemetry to a platform, build dashboards, configure alerts, and wait for something to break. When it does, we manually sift through traces, correlate logs, and pattern-match against our tribal knowledge of &amp;ldquo;things that have gone wrong before.&amp;rdquo;&lt;/p&gt;
+&lt;p&gt;This works—until it doesn&amp;rsquo;t. The complexity of distributed systems has outpaced human cognitive bandwidth. N+1 queries hide in trace waterfalls. Memory leaks creep up over days. Retry storms cascade across service boundaries in milliseconds. By the time a human notices, the damage is done.&lt;/p&gt;</description></item><item><title>The Receiver Factory: Accelerating OpenTelemetry Development</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/otel-receiver-factory/</link><pubDate>Fri, 03 Jan 2025 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/otel-receiver-factory/</guid><description>&lt;h2 id="the-opentelemetry-coverage-problem"&gt;The OpenTelemetry Coverage Problem&lt;/h2&gt;
+&lt;p&gt;OpenTelemetry has become the standard for observability instrumentation. But there&amp;rsquo;s a gap between the standard and reality: most tools and platforms don&amp;rsquo;t have native OTel receivers.&lt;/p&gt;
+&lt;p&gt;The OpenTelemetry Collector contrib repository has receivers for major databases, cloud providers, and infrastructure components. But what about your Airflow deployment? Your Snowflake warehouse? Your custom internal APIs?&lt;/p&gt;
+&lt;p&gt;Building a production-quality OTel receiver typically takes days to weeks. You need to understand the source API, map data to semantic conventions, handle authentication, implement proper error handling, write tests, and integrate with the collector build system.&lt;/p&gt;</description></item></channel></rss>

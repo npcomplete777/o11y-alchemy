@@ -2,10 +2,10 @@
 title: "VALIS: Autonomous Anti-Pattern Detection for Production Observability"
 date: 2026-02-01
 draft: false
-tags: ["VALIS", "MCP", "Dash0", "anti-patterns", "autonomous-observability", "statistical-analysis"]
+tags: ["VALIS", "MCP", "OpenTelemetry", "anti-patterns", "autonomous-observability", "statistical-analysis"]
 categories: ["Architecture", "Innovation"]
 author: "Aaron Jacobs"
-description: "A deep technical exploration of VALIS—the Vast Active Living Intelligence System—and how its native integration with Dash0 telemetry enables autonomous detection of performance anti-patterns in distributed systems."
+description: "A deep technical exploration of VALIS—the Vast Active Living Intelligence System—an MCP server that brings autonomous anti-pattern detection and probabilistic reasoning to production observability pipelines."
 ---
 
 ## The Problem with Passive Observability
@@ -32,25 +32,23 @@ VALIS provides 14 specialized tools spanning:
 
 The key insight: these tools are *composable*. An AI agent can chain them together to perform comprehensive analysis that would take a human engineer hours.
 
-## Native Dash0 Integration
+## Native OTel Integration
 
-Here's where it gets interesting for the Dash0 engineering team.
-
-VALIS analyzes observability data *natively*. The `valis_analyze_spans`, `valis_analyze_logs`, and `valis_analyze_metrics` tools accept raw OTLP-compatible data—exactly what Dash0 collects and stores. There's no transformation layer, no proprietary format, no vendor lock-in.
+VALIS analyzes observability data *natively*. The `valis_analyze_spans`, `valis_analyze_logs`, and `valis_analyze_metrics` tools accept raw OTLP-compatible data. There's no transformation layer, no proprietary format, no vendor lock-in.
 
 A typical workflow looks like this:
 
 ```
-1. Query spans from Dash0: dash0_spans_query(service_name="checkout", limit=200)
-2. Feed directly to VALIS: valis_analyze_spans(spans=<dash0_response>)
+1. Query spans from your platform: spans_query(service_name="checkout", limit=200)
+2. Feed directly to VALIS: valis_analyze_spans(spans=<response>)
 3. Get findings with calibrated confidence scores
 ```
 
-The integration is seamless because both systems speak OpenTelemetry natively. Dash0's span attributes map directly to VALIS's semantic convention expectations. Trace IDs correlate. Service names align. It just works.
+The integration works with any OpenTelemetry-native backend because VALIS operates on standard OTLP semantics. Span attributes, trace IDs, and service names follow OTel conventions — there's nothing platform-specific to configure.
 
-### What I Observed Today
+### What I Observed
 
-Running VALIS against live Dash0 telemetry from an OpenTelemetry demo deployment, I captured:
+Running VALIS against live OTLP telemetry from an OpenTelemetry demo deployment, I captured:
 
 - **200 spans** across 15+ microservices (frontend, checkout, cart, payment, product-catalog, recommendation, etc.)
 - **200 logs** with correlated trace context
@@ -128,14 +126,14 @@ Imagine this workflow, fully automated:
 
 This isn't science fiction. I've demonstrated each component working. The integration is the engineering challenge—and Dash0 is uniquely positioned to enable it.
 
-### Why Dash0?
+### What Platform Integration Could Look Like
 
-Dash0's OpenTelemetry-native architecture makes VALIS integration trivial. But there's a deeper opportunity:
+Any OTel-native observability platform could deepen this integration meaningfully:
 
-1. **Built-in instrumentation assessment**: Dash0 could surface VALIS's data quality scores, helping users understand where their instrumentation gaps are
-2. **Native anti-pattern detection**: Embed VALIS analysis in the Dash0 UI, surfacing findings alongside traces and logs
+1. **Built-in instrumentation assessment**: Surface VALIS's data quality scores alongside dashboards, so teams understand where their instrumentation gaps are
+2. **Native anti-pattern detection**: Embed VALIS analysis in trace views, surfacing findings at query time rather than requiring a separate tool invocation
 3. **Proactive alerting**: Move beyond threshold alerts to probability-based warnings ("73% chance of connection pool exhaustion in next 2 hours")
-4. **Remediation suggestions**: VALIS findings include actionable recommendations—Dash0 could integrate with ticketing/runbook systems
+4. **Remediation suggestions**: VALIS findings include actionable recommendations that could feed directly into ticketing or runbook systems
 
 ## The Philosophical Shift
 
@@ -147,13 +145,11 @@ The human remains in the loop—but as a strategic decision-maker, not a pattern
 
 ## Try It Yourself
 
-VALIS is available as an MCP server. Point it at your Dash0 data and see what it finds. The integration is straightforward:
+VALIS is available as an MCP server. Point it at your observability data and see what it finds. The integration is straightforward:
 
-1. Query telemetry from Dash0 (`dash0_spans_query`, `dash0_logs_query`)
+1. Query telemetry from your platform (`spans_query`, `logs_query`)
 2. Pipe to VALIS (`valis_analyze_spans`, `valis_analyze_logs`, `valis_analyze_metrics`)
 3. Explore findings with probability scores and evidence chains
-
-For the Dash0 engineering team: I'd love to explore deeper integration. VALIS's statistical engine combined with Dash0's data platform could redefine what "observability" means.
 
 The telemetry is already there. The algorithms exist. The question is: are we ready for observability that thinks?
 

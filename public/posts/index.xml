@@ -1,75 +1,40 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
-  <channel>
-    <title>Posts on O11y Alchemy</title>
-    <link>https://npcomplete777.github.io/o11y-alchemy/posts/</link>
-    <description>Recent content in Posts on O11y Alchemy</description>
-    <generator>Hugo -- 0.155.2</generator>
-    <language>en-us</language>
-    <lastBuildDate>Wed, 04 Feb 2026 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://npcomplete777.github.io/o11y-alchemy/posts/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>From 504 Timeout to 35ms: Autonomous Remediation of Silent Checkout Failures</title>
-      <link>https://npcomplete777.github.io/o11y-alchemy/posts/autonomous-remediation-silent-checkout/</link>
-      <pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate>
-      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/autonomous-remediation-silent-checkout/</guid>
-      <description>A demonstration of fully autonomous code remediation: VALIS detected a critical silent checkout failure pattern, generated an async Kafka fix, deployed via GitOps, and validated a 4,700x latency improvement—all without human intervention.</description>
-    </item>
-    <item>
-      <title>The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology</title>
-      <link>https://npcomplete777.github.io/o11y-alchemy/posts/geometry-of-failure/</link>
-      <pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate>
-      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/geometry-of-failure/</guid>
-      <description>Anti-patterns in distributed systems have geometric shapes that are invariant across languages, frameworks, and protocols. Empirical evidence from two production systems demonstrates how trace topology analysis enables language-agnostic anti-pattern detection.</description>
-    </item>
-    <item>
-      <title>Why Autonomous Remediation Requires Open Architecture</title>
-      <link>https://npcomplete777.github.io/o11y-alchemy/posts/open-architecture-autonomous-remediation/</link>
-      <pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate>
-      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/open-architecture-autonomous-remediation/</guid>
-      <description>Why composable, extensible MCP infrastructure beats proprietary closed platforms for autonomous observability operations.</description>
-    </item>
-    <item>
-      <title>Closed-Loop Observability: From Trace Detection to Autonomous Remediation</title>
-      <link>https://npcomplete777.github.io/o11y-alchemy/posts/trace-to-fix-n-plus-one-case-study/</link>
-      <pubDate>Sun, 01 Feb 2026 00:00:00 +0000</pubDate>
-      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/trace-to-fix-n-plus-one-case-study/</guid>
-      <description>A case study in closed-loop observability: using distributed traces, MCP-integrated tooling, and GitOps to autonomously identify, fix, deploy, and verify a performance anti-pattern in a microservices application—demonstrating the shift from passive monitoring to active remediation.</description>
-    </item>
-    <item>
-      <title>VALIS: Autonomous Anti-Pattern Detection for Production Observability</title>
-      <link>https://npcomplete777.github.io/o11y-alchemy/posts/valis-autonomous-anti-pattern-detection/</link>
-      <pubDate>Sun, 01 Feb 2026 00:00:00 +0000</pubDate>
-      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/valis-autonomous-anti-pattern-detection/</guid>
-      <description>A deep technical exploration of VALIS—the Vast Active Living Intelligence System—and how its native integration with Dash0 telemetry enables autonomous detection of performance anti-patterns in distributed systems.</description>
-    </item>
-    <item>
-      <title>Building AI Agents for Observability Platforms</title>
-      <link>https://npcomplete777.github.io/o11y-alchemy/posts/building-ai-agents-for-observability/</link>
-      <pubDate>Fri, 03 Jan 2025 00:00:00 +0000</pubDate>
-      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/building-ai-agents-for-observability/</guid>
-      <description>Why full API coverage matters for autonomous observability operations</description>
-    </item>
-    <item>
-      <title>Ontologies for Vendor-Agnostic Observability Migration</title>
-      <link>https://npcomplete777.github.io/o11y-alchemy/posts/observability-ontologies/</link>
-      <pubDate>Fri, 03 Jan 2025 00:00:00 +0000</pubDate>
-      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/observability-ontologies/</guid>
-      <description>Building semantic bridges between observability platforms for intelligent configuration migration</description>
-    </item>
-    <item>
-      <title>The End of DevOps Platforms</title>
-      <link>https://npcomplete777.github.io/o11y-alchemy/posts/end-of-devops-platforms/</link>
-      <pubDate>Fri, 03 Jan 2025 00:00:00 +0000</pubDate>
-      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/end-of-devops-platforms/</guid>
-      <description>Why MCP-based AI agents will replace monolithic DevOps platforms</description>
-    </item>
-    <item>
-      <title>The Receiver Factory: Accelerating OpenTelemetry Development</title>
-      <link>https://npcomplete777.github.io/o11y-alchemy/posts/otel-receiver-factory/</link>
-      <pubDate>Fri, 03 Jan 2025 00:00:00 +0000</pubDate>
-      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/otel-receiver-factory/</guid>
-      <description>Generating production-ready OTel receivers from API specifications</description>
-    </item>
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on O11y Alchemy</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/</link><description>Recent content in Posts on O11y Alchemy</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Wed, 04 Feb 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://npcomplete777.github.io/o11y-alchemy/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>From 504 Timeout to 35ms: Autonomous Remediation of Silent Checkout Failures</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/autonomous-remediation-silent-checkout/</link><pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/autonomous-remediation-silent-checkout/</guid><description>&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;The measure of intelligence is the ability to change.&amp;rdquo; — Albert Einstein&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;This case study documents a fully autonomous code remediation cycle: from anti-pattern detection through code fix, deployment, and validated improvement. No human wrote the fix. No human triggered the deployment. No human verified the results. The entire workflow was executed by VALIS (Vast Active Living Intelligence System) through MCP-integrated tooling.&lt;/p&gt;
+&lt;h2 id="the-problem-silent-order-failures"&gt;The Problem: Silent Order Failures&lt;/h2&gt;
+&lt;p&gt;Users were experiencing a frustrating pattern: they&amp;rsquo;d click &amp;ldquo;Place Order,&amp;rdquo; see a loading spinner for 15+ seconds, then receive a 504 Gateway Timeout error. Believing their order failed, they&amp;rsquo;d retry—only to discover later they&amp;rsquo;d been charged twice.&lt;/p&gt;</description></item><item><title>The Geometry of Failure: Language-Agnostic Anti-Pattern Signatures in Distributed Trace Topology</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/geometry-of-failure/</link><pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/geometry-of-failure/</guid><description>&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;The real cycle you&amp;rsquo;re working on is a cycle called yourself.&amp;rdquo; — Robert M. Pirsig, &lt;em&gt;Zen and the Art of Motorcycle Maintenance&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id="the-claim"&gt;The Claim&lt;/h2&gt;
+&lt;p&gt;I&amp;rsquo;m going to make a claim that I haven&amp;rsquo;t seen anyone else make explicitly, and then back it up with empirical evidence from three production experiments.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Anti-patterns in distributed systems produce characteristic geometric signatures in trace topology space. These signatures are invariant across programming languages, runtimes, and instrumentation strategies. A system that classifies trace geometry can detect anti-patterns without knowing anything about the underlying implementation.&lt;/strong&gt;&lt;/p&gt;</description></item><item><title>Why Autonomous Remediation Requires Open Architecture</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/open-architecture-autonomous-remediation/</link><pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/open-architecture-autonomous-remediation/</guid><description>&lt;h2 id="the-architecture-question-nobodys-asking"&gt;The Architecture Question Nobody&amp;rsquo;s Asking&lt;/h2&gt;
+&lt;p&gt;The autonomous remediation market is heating up. Vendors promise AI that fixes production issues automatically—detect the problem, identify the fix, deploy it, verify it works. The demos look impressive.&lt;/p&gt;
+&lt;p&gt;But there&amp;rsquo;s a foundational question that matters more than any feature comparison: &lt;strong&gt;Is the platform open or closed?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;This isn&amp;rsquo;t about open source licensing. It&amp;rsquo;s about architectural composability. Can you extend the system with new capabilities? Can you swap out components? Can you integrate with arbitrary backends?&lt;/p&gt;</description></item><item><title>Closed-Loop Observability: From Trace Detection to Autonomous Remediation</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/trace-to-fix-n-plus-one-case-study/</link><pubDate>Sun, 01 Feb 2026 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/trace-to-fix-n-plus-one-case-study/</guid><description>&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;The real cycle you&amp;rsquo;re working on is a cycle called yourself.&amp;rdquo; — Robert M. Pirsig, &lt;em&gt;Zen and the Art of Motorcycle Maintenance&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Modern observability platforms generate vast amounts of telemetry data—traces, metrics, and logs—that often go underutilized beyond basic dashboarding and alerting. This case study demonstrates a complete autonomous workflow for extracting actionable intelligence from distributed traces: detecting a performance anti-pattern, implementing a fix, deploying it through GitOps, and validating the improvement—all orchestrated through an AI agent integrated with observability and infrastructure tooling via the Model Context Protocol (MCP).&lt;/p&gt;</description></item><item><title>VALIS: Autonomous Anti-Pattern Detection for Production Observability</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/valis-autonomous-anti-pattern-detection/</link><pubDate>Sun, 01 Feb 2026 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/valis-autonomous-anti-pattern-detection/</guid><description>&lt;h2 id="the-problem-with-passive-observability"&gt;The Problem with Passive Observability&lt;/h2&gt;
+&lt;p&gt;Most observability workflows are fundamentally reactive. We instrument our services, ship telemetry to a platform, build dashboards, configure alerts, and wait for something to break. When it does, we manually sift through traces, correlate logs, and pattern-match against our tribal knowledge of &amp;ldquo;things that have gone wrong before.&amp;rdquo;&lt;/p&gt;
+&lt;p&gt;This works—until it doesn&amp;rsquo;t. The complexity of distributed systems has outpaced human cognitive bandwidth. N+1 queries hide in trace waterfalls. Memory leaks creep up over days. Retry storms cascade across service boundaries in milliseconds. By the time a human notices, the damage is done.&lt;/p&gt;</description></item><item><title>The Derived Ontology: From Theory to Working Migrations</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/ontology-driven-migration/</link><pubDate>Thu, 20 Feb 2025 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/ontology-driven-migration/</guid><description>&lt;h2 id="from-concept-to-proof"&gt;From Concept to Proof&lt;/h2&gt;
+&lt;p&gt;In January I wrote about &lt;a href="https://npcomplete777.github.io/o11y-alchemy/posts/observability-ontologies/"&gt;ontologies for vendor-agnostic observability migration&lt;/a&gt;—the idea that a canonical semantic layer could bridge the conceptual gaps between platforms. That post was theory. This one is about what happened when we built it and pointed it at real infrastructure.&lt;/p&gt;
+&lt;p&gt;The short version: we now have autonomous, AI-driven migration of dashboards and alert rules across three observability stacks—ELK (Elasticsearch/Kibana), LGTM (Loki/Grafana/Tempo/Mimir), and Dash0—using derived ontological mappings that an AI agent traverses at runtime. Not scripts. Not templates. An agent that reads a source dashboard, understands what each panel &lt;em&gt;means&lt;/em&gt;, and rebuilds it idiomatically on the target platform.&lt;/p&gt;</description></item><item><title>Building AI Agents for Observability Platforms</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/building-ai-agents-for-observability/</link><pubDate>Fri, 03 Jan 2025 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/building-ai-agents-for-observability/</guid><description>&lt;h2 id="the-gap-in-vendor-ai-integrations"&gt;The Gap in Vendor AI Integrations&lt;/h2&gt;
+&lt;p&gt;Every major observability vendor shipped AI capabilities in 2024-2025. Dynatrace, Datadog, New Relic, Honeycomb—they all have chatbots now that can answer questions about your environment.&lt;/p&gt;
+&lt;p&gt;But there&amp;rsquo;s a pattern: they expose &lt;strong&gt;read access&lt;/strong&gt; generously while keeping &lt;strong&gt;write access&lt;/strong&gt; tightly controlled.&lt;/p&gt;
+&lt;p&gt;You can ask &amp;ldquo;what problems are open?&amp;rdquo; but you can&amp;rsquo;t say &amp;ldquo;create a dashboard for this incident.&amp;rdquo; You can query metrics but you can&amp;rsquo;t configure alerts. The AI can observe but it can&amp;rsquo;t operate.&lt;/p&gt;</description></item><item><title>Ontologies for Vendor-Agnostic Observability Migration</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/observability-ontologies/</link><pubDate>Fri, 03 Jan 2025 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/observability-ontologies/</guid><description>&lt;h2 id="the-migration-problem"&gt;The Migration Problem&lt;/h2&gt;
+&lt;p&gt;Observability platform migrations are notoriously painful. Whether you&amp;rsquo;re moving from Datadog to Dynatrace, New Relic to Grafana, or any other combination, the process typically involves:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Exporting dashboards and alerts as JSON&lt;/li&gt;
+&lt;li&gt;Manually mapping fields between schemas&lt;/li&gt;
+&lt;li&gt;Rewriting queries in the target platform&amp;rsquo;s language&lt;/li&gt;
+&lt;li&gt;Rebuilding what doesn&amp;rsquo;t translate&lt;/li&gt;
+&lt;li&gt;Hoping nothing breaks&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This is &lt;strong&gt;syntactic translation&lt;/strong&gt;—moving symbols between systems without understanding what they mean.&lt;/p&gt;
+&lt;p&gt;The result: migrations take months, cost more than expected, and leave gaps that only surface in production.&lt;/p&gt;</description></item><item><title>The End of DevOps Platforms</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/end-of-devops-platforms/</link><pubDate>Fri, 03 Jan 2025 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/end-of-devops-platforms/</guid><description>&lt;h2 id="the-platform-era"&gt;The Platform Era&lt;/h2&gt;
+&lt;p&gt;For the past decade, the DevOps market has consolidated around platforms. Harness, GitLab Ultimate, GitHub Enterprise, CircleCI—they all sell the same promise: unified DevOps under one roof.&lt;/p&gt;
+&lt;p&gt;The pitch makes sense. Before platforms, teams stitched together Jenkins, custom scripts, and a dozen point solutions. It was fragile and expensive to maintain. Platforms offered integration, governance, and a single pane of glass.&lt;/p&gt;
+&lt;p&gt;But platforms come with tradeoffs: vendor lock-in, lowest-common-denominator features, and pricing that scales with headcount rather than value.&lt;/p&gt;</description></item><item><title>The Receiver Factory: Accelerating OpenTelemetry Development</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/otel-receiver-factory/</link><pubDate>Fri, 03 Jan 2025 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/otel-receiver-factory/</guid><description>&lt;h2 id="the-opentelemetry-coverage-problem"&gt;The OpenTelemetry Coverage Problem&lt;/h2&gt;
+&lt;p&gt;OpenTelemetry has become the standard for observability instrumentation. But there&amp;rsquo;s a gap between the standard and reality: most tools and platforms don&amp;rsquo;t have native OTel receivers.&lt;/p&gt;
+&lt;p&gt;The OpenTelemetry Collector contrib repository has receivers for major databases, cloud providers, and infrastructure components. But what about your Airflow deployment? Your Snowflake warehouse? Your custom internal APIs?&lt;/p&gt;
+&lt;p&gt;Building a production-quality OTel receiver typically takes days to weeks. You need to understand the source API, map data to semantic conventions, handle authentication, implement proper error handling, write tests, and integrate with the collector build system.&lt;/p&gt;</description></item></channel></rss>

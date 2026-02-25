@@ -1,26 +1,7 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
-  <channel>
-    <title>Agentic-Ai on O11y Alchemy</title>
-    <link>https://npcomplete777.github.io/o11y-alchemy/tags/agentic-ai/</link>
-    <description>Recent content in Agentic-Ai on O11y Alchemy</description>
-    <generator>Hugo -- 0.155.2</generator>
-    <language>en-us</language>
-    <lastBuildDate>Fri, 03 Jan 2025 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://npcomplete777.github.io/o11y-alchemy/tags/agentic-ai/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Building AI Agents for Observability Platforms</title>
-      <link>https://npcomplete777.github.io/o11y-alchemy/posts/building-ai-agents-for-observability/</link>
-      <pubDate>Fri, 03 Jan 2025 00:00:00 +0000</pubDate>
-      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/building-ai-agents-for-observability/</guid>
-      <description>Why full API coverage matters for autonomous observability operations</description>
-    </item>
-    <item>
-      <title>The End of DevOps Platforms</title>
-      <link>https://npcomplete777.github.io/o11y-alchemy/posts/end-of-devops-platforms/</link>
-      <pubDate>Fri, 03 Jan 2025 00:00:00 +0000</pubDate>
-      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/end-of-devops-platforms/</guid>
-      <description>Why MCP-based AI agents will replace monolithic DevOps platforms</description>
-    </item>
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Agentic-Ai on O11y Alchemy</title><link>https://npcomplete777.github.io/o11y-alchemy/tags/agentic-ai/</link><description>Recent content in Agentic-Ai on O11y Alchemy</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Fri, 03 Jan 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://npcomplete777.github.io/o11y-alchemy/tags/agentic-ai/index.xml" rel="self" type="application/rss+xml"/><item><title>Building AI Agents for Observability Platforms</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/building-ai-agents-for-observability/</link><pubDate>Fri, 03 Jan 2025 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/building-ai-agents-for-observability/</guid><description>&lt;h2 id="the-gap-in-vendor-ai-integrations"&gt;The Gap in Vendor AI Integrations&lt;/h2&gt;
+&lt;p&gt;Every major observability vendor shipped AI capabilities in 2024-2025. Dynatrace, Datadog, New Relic, Honeycomb—they all have chatbots now that can answer questions about your environment.&lt;/p&gt;
+&lt;p&gt;But there&amp;rsquo;s a pattern: they expose &lt;strong&gt;read access&lt;/strong&gt; generously while keeping &lt;strong&gt;write access&lt;/strong&gt; tightly controlled.&lt;/p&gt;
+&lt;p&gt;You can ask &amp;ldquo;what problems are open?&amp;rdquo; but you can&amp;rsquo;t say &amp;ldquo;create a dashboard for this incident.&amp;rdquo; You can query metrics but you can&amp;rsquo;t configure alerts. The AI can observe but it can&amp;rsquo;t operate.&lt;/p&gt;</description></item><item><title>The End of DevOps Platforms</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/end-of-devops-platforms/</link><pubDate>Fri, 03 Jan 2025 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/end-of-devops-platforms/</guid><description>&lt;h2 id="the-platform-era"&gt;The Platform Era&lt;/h2&gt;
+&lt;p&gt;For the past decade, the DevOps market has consolidated around platforms. Harness, GitLab Ultimate, GitHub Enterprise, CircleCI—they all sell the same promise: unified DevOps under one roof.&lt;/p&gt;
+&lt;p&gt;The pitch makes sense. Before platforms, teams stitched together Jenkins, custom scripts, and a dozen point solutions. It was fragile and expensive to maintain. Platforms offered integration, governance, and a single pane of glass.&lt;/p&gt;
+&lt;p&gt;But platforms come with tradeoffs: vendor lock-in, lowest-common-denominator features, and pricing that scales with headcount rather than value.&lt;/p&gt;</description></item></channel></rss>

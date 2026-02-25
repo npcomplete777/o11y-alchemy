@@ -1,19 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
-  <channel>
-    <title>Architecture on O11y Alchemy</title>
-    <link>https://npcomplete777.github.io/o11y-alchemy/tags/architecture/</link>
-    <description>Recent content in Architecture on O11y Alchemy</description>
-    <generator>Hugo -- 0.155.2</generator>
-    <language>en-us</language>
-    <lastBuildDate>Wed, 04 Feb 2026 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://npcomplete777.github.io/o11y-alchemy/tags/architecture/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Why Autonomous Remediation Requires Open Architecture</title>
-      <link>https://npcomplete777.github.io/o11y-alchemy/posts/open-architecture-autonomous-remediation/</link>
-      <pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate>
-      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/open-architecture-autonomous-remediation/</guid>
-      <description>Why composable, extensible MCP infrastructure beats proprietary closed platforms for autonomous observability operations.</description>
-    </item>
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Architecture on O11y Alchemy</title><link>https://npcomplete777.github.io/o11y-alchemy/tags/architecture/</link><description>Recent content in Architecture on O11y Alchemy</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Wed, 04 Feb 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://npcomplete777.github.io/o11y-alchemy/tags/architecture/index.xml" rel="self" type="application/rss+xml"/><item><title>Why Autonomous Remediation Requires Open Architecture</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/open-architecture-autonomous-remediation/</link><pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/open-architecture-autonomous-remediation/</guid><description>&lt;h2 id="the-architecture-question-nobodys-asking"&gt;The Architecture Question Nobody&amp;rsquo;s Asking&lt;/h2&gt;
+&lt;p&gt;The autonomous remediation market is heating up. Vendors promise AI that fixes production issues automatically—detect the problem, identify the fix, deploy it, verify it works. The demos look impressive.&lt;/p&gt;
+&lt;p&gt;But there&amp;rsquo;s a foundational question that matters more than any feature comparison: &lt;strong&gt;Is the platform open or closed?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;This isn&amp;rsquo;t about open source licensing. It&amp;rsquo;s about architectural composability. Can you extend the system with new capabilities? Can you swap out components? Can you integrate with arbitrary backends?&lt;/p&gt;</description></item></channel></rss>

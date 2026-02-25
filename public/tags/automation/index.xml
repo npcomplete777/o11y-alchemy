@@ -1,19 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
-  <channel>
-    <title>Automation on O11y Alchemy</title>
-    <link>https://npcomplete777.github.io/o11y-alchemy/tags/automation/</link>
-    <description>Recent content in Automation on O11y Alchemy</description>
-    <generator>Hugo -- 0.155.2</generator>
-    <language>en-us</language>
-    <lastBuildDate>Fri, 03 Jan 2025 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://npcomplete777.github.io/o11y-alchemy/tags/automation/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>The Receiver Factory: Accelerating OpenTelemetry Development</title>
-      <link>https://npcomplete777.github.io/o11y-alchemy/posts/otel-receiver-factory/</link>
-      <pubDate>Fri, 03 Jan 2025 00:00:00 +0000</pubDate>
-      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/otel-receiver-factory/</guid>
-      <description>Generating production-ready OTel receivers from API specifications</description>
-    </item>
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Automation on O11y Alchemy</title><link>https://npcomplete777.github.io/o11y-alchemy/tags/automation/</link><description>Recent content in Automation on O11y Alchemy</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Fri, 03 Jan 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://npcomplete777.github.io/o11y-alchemy/tags/automation/index.xml" rel="self" type="application/rss+xml"/><item><title>The Receiver Factory: Accelerating OpenTelemetry Development</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/otel-receiver-factory/</link><pubDate>Fri, 03 Jan 2025 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/otel-receiver-factory/</guid><description>&lt;h2 id="the-opentelemetry-coverage-problem"&gt;The OpenTelemetry Coverage Problem&lt;/h2&gt;
+&lt;p&gt;OpenTelemetry has become the standard for observability instrumentation. But there&amp;rsquo;s a gap between the standard and reality: most tools and platforms don&amp;rsquo;t have native OTel receivers.&lt;/p&gt;
+&lt;p&gt;The OpenTelemetry Collector contrib repository has receivers for major databases, cloud providers, and infrastructure components. But what about your Airflow deployment? Your Snowflake warehouse? Your custom internal APIs?&lt;/p&gt;
+&lt;p&gt;Building a production-quality OTel receiver typically takes days to weeks. You need to understand the source API, map data to semantic conventions, handle authentication, implement proper error handling, write tests, and integrate with the collector build system.&lt;/p&gt;</description></item></channel></rss>

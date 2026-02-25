@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>N&#43;1 on O11y Alchemy</title>
+    <link>https://npcomplete777.github.io/o11y-alchemy/tags/n&#43;1/</link>
+    <description>Recent content in N&#43;1 on O11y Alchemy</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 07 Feb 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://npcomplete777.github.io/o11y-alchemy/tags/n+1/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Anti-Patterns Have Shapes, and Shapes Don&#39;t Care What Language You Write In</title>
+      <link>https://npcomplete777.github.io/o11y-alchemy/posts/language-invariant-anti-patterns/</link>
+      <pubDate>Sat, 07 Feb 2026 00:00:00 +0000</pubDate>
+      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/language-invariant-anti-patterns/</guid>
+      <description>&lt;p&gt;&lt;em&gt;How I proved that distributed system anti-patterns produce identical trace geometry across Go, Python, and Java — and why that changes everything about autonomous detection.&lt;/em&gt;&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;p&gt;A distributed trace is a tree. Each node is a span — a named, timed unit of work. Each edge is a causal relationship: this span caused that span. The tree has a shape.&lt;/p&gt;&#xA;&lt;p&gt;I&amp;rsquo;ve been building an autonomous observability system that I call the &lt;em&gt;Bayesian Trace Topology Analyzer&lt;/em&gt; — a detection engine that identifies performance anti-patterns by analyzing the shapes of trace trees. Not the contents. Not the language. Not the framework. The shapes.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

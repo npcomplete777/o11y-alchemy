@@ -1,26 +1,9 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
-  <channel>
-    <title>Closed-Loop on O11y Alchemy</title>
-    <link>https://npcomplete777.github.io/o11y-alchemy/tags/closed-loop/</link>
-    <description>Recent content in Closed-Loop on O11y Alchemy</description>
-    <generator>Hugo -- 0.155.2</generator>
-    <language>en-us</language>
-    <lastBuildDate>Wed, 04 Feb 2026 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://npcomplete777.github.io/o11y-alchemy/tags/closed-loop/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>From 504 Timeout to 35ms: Autonomous Remediation of Silent Checkout Failures</title>
-      <link>https://npcomplete777.github.io/o11y-alchemy/posts/autonomous-remediation-silent-checkout/</link>
-      <pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate>
-      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/autonomous-remediation-silent-checkout/</guid>
-      <description>A demonstration of fully autonomous code remediation: VALIS detected a critical silent checkout failure pattern, generated an async Kafka fix, deployed via GitOps, and validated a 4,700x latency improvement—all without human intervention.</description>
-    </item>
-    <item>
-      <title>Closed-Loop Observability: From Trace Detection to Autonomous Remediation</title>
-      <link>https://npcomplete777.github.io/o11y-alchemy/posts/trace-to-fix-n-plus-one-case-study/</link>
-      <pubDate>Sun, 01 Feb 2026 00:00:00 +0000</pubDate>
-      <guid>https://npcomplete777.github.io/o11y-alchemy/posts/trace-to-fix-n-plus-one-case-study/</guid>
-      <description>A case study in closed-loop observability: using distributed traces, MCP-integrated tooling, and GitOps to autonomously identify, fix, deploy, and verify a performance anti-pattern in a microservices application—demonstrating the shift from passive monitoring to active remediation.</description>
-    </item>
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Closed-Loop on O11y Alchemy</title><link>https://npcomplete777.github.io/o11y-alchemy/tags/closed-loop/</link><description>Recent content in Closed-Loop on O11y Alchemy</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Wed, 04 Feb 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://npcomplete777.github.io/o11y-alchemy/tags/closed-loop/index.xml" rel="self" type="application/rss+xml"/><item><title>From 504 Timeout to 35ms: Autonomous Remediation of Silent Checkout Failures</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/autonomous-remediation-silent-checkout/</link><pubDate>Wed, 04 Feb 2026 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/autonomous-remediation-silent-checkout/</guid><description>&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;The measure of intelligence is the ability to change.&amp;rdquo; — Albert Einstein&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;This case study documents a fully autonomous code remediation cycle: from anti-pattern detection through code fix, deployment, and validated improvement. No human wrote the fix. No human triggered the deployment. No human verified the results. The entire workflow was executed by VALIS (Vast Active Living Intelligence System) through MCP-integrated tooling.&lt;/p&gt;
+&lt;h2 id="the-problem-silent-order-failures"&gt;The Problem: Silent Order Failures&lt;/h2&gt;
+&lt;p&gt;Users were experiencing a frustrating pattern: they&amp;rsquo;d click &amp;ldquo;Place Order,&amp;rdquo; see a loading spinner for 15+ seconds, then receive a 504 Gateway Timeout error. Believing their order failed, they&amp;rsquo;d retry—only to discover later they&amp;rsquo;d been charged twice.&lt;/p&gt;</description></item><item><title>Closed-Loop Observability: From Trace Detection to Autonomous Remediation</title><link>https://npcomplete777.github.io/o11y-alchemy/posts/trace-to-fix-n-plus-one-case-study/</link><pubDate>Sun, 01 Feb 2026 00:00:00 +0000</pubDate><guid>https://npcomplete777.github.io/o11y-alchemy/posts/trace-to-fix-n-plus-one-case-study/</guid><description>&lt;blockquote&gt;
+&lt;p&gt;&amp;ldquo;The real cycle you&amp;rsquo;re working on is a cycle called yourself.&amp;rdquo; — Robert M. Pirsig, &lt;em&gt;Zen and the Art of Motorcycle Maintenance&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Modern observability platforms generate vast amounts of telemetry data—traces, metrics, and logs—that often go underutilized beyond basic dashboarding and alerting. This case study demonstrates a complete autonomous workflow for extracting actionable intelligence from distributed traces: detecting a performance anti-pattern, implementing a fix, deploying it through GitOps, and validating the improvement—all orchestrated through an AI agent integrated with observability and infrastructure tooling via the Model Context Protocol (MCP).&lt;/p&gt;</description></item></channel></rss>
