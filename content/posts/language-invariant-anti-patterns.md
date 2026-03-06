@@ -254,8 +254,6 @@ After the analyzer flagged the Go checkout service's `prepOrderItems` function a
 
 The trace geometry changed immediately. The comb — one spine with many sequential identical teeth — collapsed into a fan: a single parent with concurrent children whose start times overlap. The Bayesian confidence for N+1 dropped to near zero. The detector confirmed the fix without any code-level analysis; it simply observed that the geometric signature had disappeared.
 
-This same investigation also surfaced a second anti-pattern in the checkout path: `sendToPostProcessor` was blocking on synchronous Kafka writes, causing requests to exceed Envoy's 15-second timeout and producing 504 errors. That fix — converting to a fire-and-forget pattern with background goroutine acknowledgment handling — is also committed ([`e2af374`](https://github.com/open-telemetry/opentelemetry-demo/commit/e2af3748dff418ed3b2cc243af5636b521e99dba)). It's a different anti-pattern (sync-over-async, or what I call "The Lollipop") but the detection principle is identical: the trace tree's shape betrayed the problem before any code review did.
-
 ---
 
 ## Why This Matters

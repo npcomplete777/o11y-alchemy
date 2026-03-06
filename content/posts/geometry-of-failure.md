@@ -180,30 +180,9 @@ If anti-patterns have characteristic geometries, we can define a taxonomy — a 
 
 Each geometry is detectable through the same structural analysis framework. The Bayesian evidence streams differ — different properties matter for different patterns — but the methodology is invariant.
 
-## The Lollipop: A Second Observed Case
-
-A second detection in the same checkout service demonstrates the framework generalizing to a different anti-pattern.
-
-```
-PlaceOrder (165,084ms)                 ← 2.75 MINUTES
-├─ prepareOrderItems (49ms)            ← Fast
-├─ ChargePayment (3ms)                 ← Fast
-├─ SendConfirmation (7ms)              ← Fast
-├─ EmptyCart (2ms)                     ← Fast
-└─ sendToPostProcessor (165,000ms)     ← BLOCKING KAFKA WRITE
-   └─ orders publish (142,732ms)
-      └─ Kafka ack wait...
-```
-
-The structural properties: moderate fan-out, heterogeneous children, sequential execution, with one extreme outlier that accounts for 99.9% of total duration. The lollipop shape. The checkout service was blocking on a Kafka acknowledgment, turning a fire-and-forget operation into a synchronous call that could hold for minutes. Meanwhile, the payment was charged and the confirmation email was sent — the user saw a 504 timeout believing their order failed.
-
-The detection method was identical to the N+1 case: analyze the trace tree's structural properties, classify the geometry, identify the pathology. No knowledge of Kafka internals was required — geometry flagged the problem before any code review did.
-
-The fix: async fire-and-forget with background acknowledgment handling. Post-deployment: 4,700x improvement, from 165 seconds to 35 milliseconds. Committed at [`e2af374`](https://github.com/open-telemetry/opentelemetry-demo/commit/e2af3748dff418ed3b2cc243af5636b521e99dba).
-
 ## The Three-Layer Architecture
 
-Both case studies reveal a clean separation into three layers:
+The N+1 case study reveals a clean separation into three layers:
 
 **Layer 1: Geometry (universal).** The structural properties of the trace tree — fan-out, temporal pattern, duration distribution, homogeneity. This is where detection happens. Language-agnostic. Framework-agnostic. Vendor-agnostic.
 

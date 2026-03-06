@@ -32,13 +32,7 @@ Complete perceive-reason-act-verify cycles demonstrated end-to-end:
 - Deployed via ArgoCD GitOps
 - Verified 59% latency reduction in production telemetry
 
-**Case 2: Synchronous-over-Async (Go + Kafka)**
-- Detected 165-second blocking Kafka write causing silent order failures
-- Generated async fire-and-forget pattern with background ACK handling
-- Deployed autonomously
-- Verified 4,700x improvement (165 seconds → 35 milliseconds)
-
-Both fixes were implemented, deployed, and validated without human intervention. The commits are public. The telemetry is verifiable.
+The fix was implemented, deployed, and validated without human intervention. The commits are public. The telemetry is verifiable.
 
 ### MCP-Based Open Architecture
 The autonomy is built on composable infrastructure, not proprietary platforms:
