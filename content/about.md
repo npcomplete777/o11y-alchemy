@@ -28,7 +28,7 @@ Complete perceive-reason-act-verify cycles demonstrated end-to-end:
 
 **Case 1: N+1 Query (Go + gRPC)**
 - Detected 2N+2 sequential service calls scaling linearly with cart size
-- Generated batch RPC fix collapsing to constant 3 calls
+- Generated concurrent fan-out fix using errgroup to parallelize RPCs
 - Deployed via ArgoCD GitOps
 - Verified 59% latency reduction in production telemetry
 

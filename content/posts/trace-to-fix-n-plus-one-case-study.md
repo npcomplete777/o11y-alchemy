@@ -59,8 +59,8 @@ The pattern was unmistakable: for each item in the cart, the service made one ca
 
 The autonomous analysis generated a structured anti-pattern report matching the signature for N+1 queries:
 
-**Pattern Classification**: N+1 Query (Database/RPC Anti-Pattern)  
-**Severity**: HIGH  
+**Pattern Classification**: N+1 Query (Database/RPC Anti-Pattern)
+**Severity**: HIGH
 **Trace ID**: F7YezTFog00u6FjTVe+PAA==
 
 **Impact Assessment**:
@@ -79,75 +79,64 @@ func (cs *checkout) prepOrderItems(ctx context.Context,
     items []*pb.CartItem, userCurrency string) ([]*pb.OrderItem, error) {
     out := make([]*pb.OrderItem, len(items))
     for i, item := range items {
-        // N+1: GetProduct called for EACH item
+        // N+1: GetProduct called for EACH item sequentially
         product, err := cs.productCatalogSvcClient.GetProduct(...)
-        // N+1: Convert called for EACH item
+        // N+1: Convert called for EACH item sequentially
         price, err := cs.convertCurrency(ctx, product.GetPriceUsd()...)
     }
 ```
 
-The trace data directly mapped to the code structure: each span represented one iteration of the loop. With 10 items in a cart, this pattern would generate 22 RPC calls (2×10 + GetCart + GetShippingQuote) instead of the optimal 4.
+The trace data directly mapped to the code structure: each span represented one iteration of the loop. With 10 items in a cart, this pattern would generate 22 RPC calls (2×10 + GetCart + GetShippingQuote) instead of far fewer with concurrent execution.
 
-## 2. Implementing the Batch RPC Fix
+## 2. Implementing the Concurrent Fix
 
-### The Solution: Batch Operations
+### The Solution: Parallel Fan-Out with errgroup
 
-The fix required two components: adding batch methods to the downstream services and refactoring the checkout service to use them.
+The core problem was that the `for` loop processed each cart item sequentially—each `GetProduct` call had to complete before the next one could start. Since the items are independent of each other, they can all be fetched concurrently.
 
-**ProductCatalogService**: Added a `GetProducts` method that accepts an array of product IDs and returns all products in a single response.
-
-**CurrencyService**: Added a `ConvertCurrencies` method that accepts an array of amounts and converts them all in one call.
-
-**CheckoutService**: Refactored `prepOrderItems` to collect all product IDs upfront, make a single batch call, then process results:
+The fix used Go's `errgroup` package to fan out all cart item processing into concurrent goroutines:
 
 ```go
 func (cs *checkout) prepOrderItems(ctx context.Context,
     items []*pb.CartItem, userCurrency string) ([]*pb.OrderItem, error) {
-    
     out := make([]*pb.OrderItem, len(items))
-    
-    // SOLUTION: Collect all product IDs first
-    productIds := make([]string, len(items))
+
+    // Fan out: process all items concurrently
+    g, ctx := errgroup.WithContext(ctx)
+
     for i, item := range items {
-        productIds[i] = item.GetProductId()
+        i, item := i, item // capture loop variables
+        g.Go(func() error {
+            product, err := cs.productCatalogSvcClient.GetProduct(
+                ctx, &pb.GetProductRequest{Id: item.GetProductId()})
+            if err != nil {
+                return fmt.Errorf("failed to get product #%q", item.GetProductId())
+            }
+            price, err := cs.convertCurrency(ctx, product.GetPriceUsd(), userCurrency)
+            if err != nil {
+                return fmt.Errorf("failed to convert price of %q to %s",
+                    item.GetProductId(), userCurrency)
+            }
+            out[i] = &pb.OrderItem{Item: item, Cost: price}
+            return nil
+        })
     }
-    
-    // Single batch call to get all products
-    products, err := cs.productCatalogSvcClient.GetProducts(
-        ctx, &pb.GetProductsRequest{Ids: productIds})
-    if err != nil {
-        return nil, fmt.Errorf("failed to get products: %v", err)
+
+    if err := g.Wait(); err != nil {
+        return nil, err
     }
-    
-    // Create map for O(1) product lookup
-    productMap := make(map[string]*pb.Product)
-    for _, product := range products {
-        productMap[product.Id] = product
-    }
-    
-    // Collect all prices for batch currency conversion
-    pricesUSD := make([]*pb.Money, len(items))
-    for i, item := range items {
-        product := productMap[item.GetProductId()]
-        pricesUSD[i] = product.GetPriceUsd()
-    }
-    
-    // Single batch call to convert all prices
-    convertedPrices, err := cs.convertCurrencies(ctx, pricesUSD, userCurrency)
-    if err != nil {
-        return nil, fmt.Errorf("failed to convert prices: %v", err)
-    }
-    
-    // Assemble order items
-    for i, item := range items {
-        out[i] = &pb.OrderItem{Item: item, Cost: convertedPrices[i]}
-    }
-    
     return out, nil
 }
 ```
 
-The implementation can be viewed in the [GitHub commit history](https://github.com/npcomplete777/opentelemetry-demo/commits/fix/n-plus-one-checkout-batch).
+Key properties of this fix:
+
+- **No proto changes required.** The existing `GetProduct` and `Convert` RPCs are reused as-is. No new batch endpoints need to be added to downstream services.
+- **Wall-clock time drops from O(N) to O(1).** All items process concurrently, so total time is bounded by the slowest single item, not the sum of all items.
+- **Fast-fail on first error.** `errgroup.WithContext` cancels all in-flight goroutines if any single item fails, preventing wasted work.
+- **Thread-safe by construction.** Each goroutine writes to its own pre-allocated index `out[i]`, so no mutex is needed.
+
+The implementation can be viewed in the [GitHub commit](https://github.com/npcomplete777/opentelemetry-demo/commit/cbf332ea25fdf3cbe9139f3b91c3ae7ad27e11cc).
 
 ### Deploying Through GitOps
 
@@ -157,15 +146,9 @@ With the code changes committed to GitHub, ArgoCD automatically detected the new
 
 ### Initial Validation: Pattern Fix Confirmed
 
-After deployment, the agent queried the observability platform again to verify the batch pattern was active. The traces now showed the expected batch pattern:
+After deployment, the agent queried the observability platform again to verify the concurrent pattern was active. The traces now showed overlapping child spans under `prepOrderItems`—multiple `GetProduct` and `Convert` calls executing simultaneously rather than in sequence. The sequential staircase pattern in the trace waterfall collapsed into a parallel fan.
 
-```
-prepOrderItems (979.56ms)
-├── GetProducts (458.18ms)      ✓ BATCH
-└── ConvertCurrencies (272.72ms) ✓ BATCH
-```
-
-The N+1 pattern was eliminated. Instead of 2N+2 calls, we now had a constant 3 calls regardless of cart size. However, the absolute latencies were still high—and some traces showed `prepOrderItems` taking 7-10 seconds.
+The N+1 sequential pattern was eliminated. Instead of 2N calls executing one after another over O(N) wall-clock time, all 2N calls now executed concurrently in O(1) wall-clock time. However, the absolute latencies were still high—and some traces showed `prepOrderItems` taking 7-10 seconds.
 
 ### The Unexpected Discovery: Resource Starvation
 
@@ -187,16 +170,17 @@ The agent patched the deployment to provide adequate resources: increasing memor
 
 ## Results: Before and After
 
-After both fixes (batch RPC pattern + resource allocation), the improvement was dramatic:
+After both fixes (concurrent fan-out + resource allocation), the improvement was dramatic:
 
 | Metric | Before | After | Improvement |
 |--------|--------|-------|-------------|
-| RPC calls (3 items) | 8 calls | 3 calls | 62.5% |
-| RPC calls (10 items) | 22 calls | 3 calls | 86.4% |
+| Cart item processing | 2N sequential RPCs | 2N concurrent RPCs | O(N) → O(1) wall-clock |
 | Kafka publish latency | 12,178ms | 0.07-0.17ms | **~100,000x** |
 | PlaceOrder latency | 7,000ms+ | 8-41ms | **~99%** |
 | Pod restarts (30 min) | 44 | 0 | **100%** |
 | Error spans | Intermittent | 0 | **100%** |
+
+The latency improvement came from two compounding factors: eliminating sequential RPC blocking (the N+1 fix) and eliminating OOMKilled restart delays (the resource fix). Neither fix alone would have achieved the full improvement.
 
 ## Why This Pattern Matters: From Detection to Remediation
 
@@ -226,7 +210,7 @@ Most organizations collect traces but use them only for request debugging. The s
 
 ### 2. Symptoms Can Mask Root Causes
 
-The "Kafka latency bottleneck" was actually OOMKilled restarts. The N+1 pattern detection led to the correct fix (batch RPCs), but the full picture required correlating telemetry with infrastructure state. Without checking pod status, we might have spent days debugging a Kafka issue that didn't exist.
+The "Kafka latency bottleneck" was actually OOMKilled restarts. The N+1 pattern detection led to the correct fix (concurrent fan-out), but the full picture required correlating telemetry with infrastructure state. Without checking pod status, we might have spent days debugging a Kafka issue that didn't exist.
 
 ### 3. MCP Enables Closed-Loop Observability
 
@@ -255,14 +239,14 @@ This is what Boyd's OODA loop (Observe, Orient, Decide, Act) looks like when the
 I (Aaron) designed this system. I built the MCP servers, established the GitOps workflows, configured the observability pipeline, and created the framework that enables autonomous remediation. But I did not:
 
 - Detect the N+1 pattern in the traces
-- Write the batch RPC implementation
+- Write the errgroup concurrency fix
 - Generate the Kubernetes resource patches
 - Decide when the fixes were production-ready
 - Verify the improvements in telemetry
 
 Those were all autonomous agent decisions executed through the infrastructure I built.
 
-My role was architect of the system, not author of the fix. The distinction matters because it reveals what AI actually amplifies: not human coding productivity, but human leverage. The 33x development acceleration I've documented isn't about typing faster—it's about building systems that can complete entire OODA loops without human intervention.
+My role was architect of the system, not author of the fix. The distinction matters because it reveals what AI actually amplifies: not human coding productivity, but human leverage. The development acceleration I've documented isn't about typing faster—it's about building systems that can complete entire OODA loops without human intervention.
 
 Pirsig wrote in *Zen and the Art of Motorcycle Maintenance* about the tension between classical understanding (the underlying form) and romantic understanding (the immediate appearance). The romantic view sees AI "helping" engineers write code. The classical view sees engineers building systems that enable AI agents to perceive, reason, and act autonomously.
 
@@ -276,10 +260,10 @@ The key insight: **observability instrumentation is code, and code can reason ab
 
 - Detect anti-patterns structurally (N+1 queries, chatty APIs, retry storms)
 - Correlate symptoms with root causes (Kafka latency ← OOMKilled restarts)
-- Implement fixes that are architecturally appropriate (batch RPCs, not caching)
+- Implement fixes that are architecturally appropriate (concurrent fan-out, not caching)
 - Verify improvements in production telemetry (closing the loop)
 
-What makes this different from traditional automation is the **autonomy of the reasoning step**. Traditional automation executes predefined rules: "if metric > threshold, then scale pods." Autonomous agents reason from first principles: "these spans suggest N+1 behavior, batch operations would eliminate it, here's the implementation, deploy it, verify it worked."
+What makes this different from traditional automation is the **autonomy of the reasoning step**. Traditional automation executes predefined rules: "if metric > threshold, then scale pods." Autonomous agents reason from first principles: "these spans suggest N+1 behavior, concurrent execution would eliminate the sequential bottleneck, here's the implementation, deploy it, verify it worked."
 
 The difference is between automation (scripted responses) and autonomy (reasoned action).
 
@@ -287,7 +271,7 @@ AI is fundamentally an **amplifier**. It magnifies the strengths of organization
 
 Rich telemetry → Programmatic access → Autonomous reasoning → Closed-loop remediation.
 
-The future of observability isn't more dashboards—it's closed-loop systems that perceive, reason, and act on production telemetry. MCP is one protocol making this future possible. VALIS (Vast Active Living Intelligence System) is one demonstration that the technical barriers are lower than they appear.
+The future of observability isn't more dashboards—it's closed-loop systems that perceive, reason, and act on production telemetry. MCP is one protocol making this future possible.
 
 The question isn't whether this is possible. The question is who will build it first.
 
@@ -300,7 +284,7 @@ The question isn't whether this is possible. The question is who will build it f
 - [Dash0](https://dash0.com)
 - [ArgoCD](https://argo-cd.readthedocs.io)
 - [Go GOMEMLIMIT](https://pkg.go.dev/runtime#hdr-Environment_Variables)
-- [GitHub Commit: N+1 Fix](https://github.com/npcomplete777/opentelemetry-demo/commit/1b14533451b0d2a1ff9070585178925399986fcb)
+- [GitHub Commit: N+1 Fix](https://github.com/npcomplete777/opentelemetry-demo/commit/cbf332ea25fdf3cbe9139f3b91c3ae7ad27e11cc)
 - [Dash0 MCP Server](https://github.com/npcomplete777/Dash0-mcp)
 - [GitHub MCP Server](https://github.com/npcomplete777/Github-mcp)
 - [Demo Video: Trace Detection & Analysis](https://youtu.be/CweT2VthiKo?si=8e_7OUMEwRAJfsNM)
